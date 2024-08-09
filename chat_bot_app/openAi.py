@@ -32,7 +32,7 @@ def prepare_company_file(company_name):
         )
         assistant_model.assistant_id = assistant.id
         assistant_model.save()
-    file_paths = [f"{company_name}.txt", "chat_bot_creator_laxout.txt"]
+    file_paths = [f"customer_files/{company_name}.txt", "customer_files/chat_bot_creator_laxout.txt"]
     file_streams = []
     for path in file_paths:
         if os.path.getsize(path) == 0:
@@ -70,7 +70,7 @@ def prepare_company_file(company_name):
     )
     message_content = messages[0].content[0].text
     new_text_content = message_content.value
-    crawl_url.save_text_to_file(new_text_content, f"{company_name}.txt")
+    crawl_url.save_text_to_file(new_text_content, f"customer_files/{company_name}.txt")
     return HttpResponse("OK")
 
 
@@ -89,7 +89,7 @@ def create_assistant(company_name, customer_object):
 
     print("Ausgeführt")
 
-    file_paths = [f"{company_name}.txt"]
+    file_paths = [f"customer_files/{company_name}.txt"]
 
     file_streams = []
     for path in file_paths:

@@ -88,7 +88,7 @@ def save_text_to_file(text, file_path):
 
 def crawl_website(url, company_name):
     base_url = url
-    output_file = f'{company_name}.txt'
+    output_file = f'customer_files/{company_name}.txt'
     print("Crawling and extracting text, please wait...")
     all_texts = crawl_and_extract(base_url)
     save_text_to_file(all_texts, output_file)
