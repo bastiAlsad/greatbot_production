@@ -27,7 +27,7 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            return redirect("home")  # Replace 'home' with your home page URL name
+            return redirect("/hub/")  # Replace 'home' with your home page URL name
     else:
         form = forms.LoginForm()
     return render(request, "registration/login.html", {"form": form})
@@ -167,8 +167,8 @@ def delete_customer(request, id = None):
     customer = models.Customer.objects.get(id = id)
     if customer.created_by == request.user:
         customer.delete()
-        return redirect("/home/")
-    return redirect("/home/")
+        return redirect("/hub/")
+    return redirect("/hub/")
 
 
 def dynamic_js(request, partner=None):
