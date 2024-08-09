@@ -1,0 +1,726 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.19.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <title>{%block title%} MySite {%endblock title%} </title>
+
+    <style>
+        #calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 9px;
+            max-width: 50vw;
+            margin: 20px;
+        }
+
+        .day {
+            text-align: center;
+            padding: 10px;
+            align-items: center;
+            justify-content: center;
+            justify-items: center;
+            display: flex;
+            color: #6c63ff;;
+            /* border: 1px solid #ccc; */
+            border-radius: 10px;
+            height: 8vh;
+            width: 6vw;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            font-size: large;
+        }
+
+        .done {
+            background-color: #6c63ff;;
+            color: white;
+            align-items: center;
+            justify-content: center;
+            justify-items: center;
+            font-size: large;
+            border-radius: 10px;
+            height: 8vh;
+            width: 6vw;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            font-size: large;
+        }
+
+        .lastMeet {
+            background-color: #232628;
+            color: white;
+            align-items: center;
+            justify-content: center;
+            justify-items: center;
+            font-size: large;
+            border-radius: 10px;
+            height: 8vh;
+            width: 6vw;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            font-size: large;
+        }
+
+        .today {
+            font-weight: bold;
+            color: rgb(231, 236, 241);
+            border: solid 3px #232628;
+            border-radius: 10px;
+            align-items: center;
+            justify-content: center;
+            justify-items: center;
+            height: 8vh;
+            width: 6vw;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            font-size: large;
+        }
+
+        body {
+            background-color: rgb(251, 251, 251) !important;
+            margin: 0px;
+        }
+
+        .row-basti {
+            justify-content: start;
+            flex-direction: row;
+            align-items: center;
+            display: flex;
+        }
+
+
+
+        .row-basti-home {
+            justify-content: start;
+            flex-direction: row;
+            align-items: center;
+            display: flex;
+            width: 170px;
+        }
+
+        .row-basti-home.active {
+            justify-content: start;
+            flex-direction: row;
+            align-items: center;
+            display: flex;
+            background-color: rgba(230, 242, 255, 0.245);
+            border-radius: 30px;
+            width: 170px;
+            height: 40px;
+            border-radius: 30px;
+            margin-right: 10px;
+        }
+
+        
+
+        .row-basti-create-customer {
+            justify-content: start;
+            flex-direction: row;
+            align-items: center;
+            display: flex;
+            width: 170px;
+        }
+
+        .row-basti-create-customer.active {
+            justify-content: start;
+            flex-direction: row;
+            align-items: center;
+            display: flex;
+            background-color: rgba(230, 242, 255, 0.245);
+            height: 40px;
+            border-radius: 30px;
+            margin-right: 10px;
+            width: 170px;
+        }
+
+
+        .column-basti {
+            padding-top: 15px;
+            justify-content: space-between;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .column-basti-center {
+            padding-top: 15px;
+            justify-content: center;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .special-button {
+            border-radius: 10px;
+            border: none;
+            background-color: rgb(167, 228, 233);
+            height: 30px;
+            width: 90px;
+            color: white;
+            cursor: pointer;
+        }
+
+
+
+        .padding-item {
+            margin-top: 30px;
+            margin-bottom: 30px;
+            margin-left: 20px;
+            margin-right: 20px;
+        }
+
+        .home-item {
+            height: 230px;
+            background-color: white;
+            border-radius: 10px;
+            width: 18vw;
+            color: black;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-item {
+            height: 90px;
+            background-color: white;
+            margin-top: 8px;
+            margin-bottom: 8px;
+            border-radius: 10px;
+            width: 70vw;
+            color: black;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            flex-direction: row;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+
+
+        .delete-button {
+            height: 47px;
+            width: 47px;
+            background-color: #6c63ff;;
+            color: white;
+            font-size: 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            border: none;
+            align-items: center;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .action-button {
+            height: 40px;
+            width: 110px;
+            background-color: #6c63ff;;
+            color: white;
+            font-size: 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            border: none;
+
+        }
+
+        .text-button-nacken {
+            border: none;
+            background: none;
+            color: #6c63ff;;
+
+        }
+
+        .text-button-nacken.active {
+            background: none;
+            border-radius: 25px;
+            color: #6c63ff;;
+            border: 2px solid #6c63ff;;
+            padding-top: 7px;
+            padding-bottom: 7px;
+            padding-left: 12px;
+            padding-right: 12px;
+        }
+
+        .text-button-schultern {
+            border: none;
+            background: none;
+            color: #6c63ff;;
+
+        }
+
+        .text-button-schultern.active {
+            background: none;
+            border-radius: 25px;
+            color: #6c63ff;;
+            border: 2px solid #6c63ff;;
+            padding-top: 7px;
+            padding-bottom: 7px;
+            padding-left: 12px;
+            padding-right: 12px;
+        }
+
+        .text-button-arme {
+            border: none;
+            background: none;
+            color: #6c63ff;;
+
+        }
+
+        .text-button-arme.active {
+            background: none;
+            border-radius: 25px;
+            color: #6c63ff;;
+            border: 2px solid #6c63ff;;
+            padding-top: 7px;
+            padding-bottom: 7px;
+            padding-left: 12px;
+            padding-right: 12px;
+        }
+
+        .text-button-mr {
+            border: none;
+            background: none;
+            color: #6c63ff;;
+
+        }
+
+        .text-button-mr.active {
+            background: none;
+            border-radius: 25px;
+            color: #6c63ff;;
+            border: 2px solid #6c63ff;;
+            padding-top: 7px;
+            padding-bottom: 7px;
+            padding-left: 12px;
+            padding-right: 12px;
+        }
+
+        .text-button-bauch {
+            border: none;
+            background: none;
+            color: #6c63ff;;
+
+        }
+
+        .text-button-bauch.active {
+            background: none;
+            border-radius: 25px;
+            color: #6c63ff;;
+            border: 2px solid #6c63ff;;
+            padding-top: 7px;
+            padding-bottom: 7px;
+            padding-left: 12px;
+            padding-right: 12px;
+        }
+
+        .text-button-ur {
+            border: none;
+            background: none;
+            color: #6c63ff;;
+
+        }
+
+        .text-button-ur.active {
+            background: none;
+            border-radius: 25px;
+            color: #6c63ff;;
+            border: 2px solid #6c63ff;;
+            padding-top: 7px;
+            padding-bottom: 7px;
+            padding-left: 12px;
+            padding-right: 12px;
+        }
+
+        .text-button-beine {
+            border: none;
+            background: none;
+            color: #6c63ff;;
+
+        }
+
+        .text-button-beine.active {
+            background: none;
+            border-radius: 25px;
+            color: #6c63ff;;
+            border: 2px solid #6c63ff;;
+            padding-top: 7px;
+            padding-bottom: 7px;
+            padding-left: 12px;
+            padding-right: 12px;
+        }
+
+        .text-button-mobilisation {
+            border: none;
+            background: none;
+            color: #6c63ff;;
+
+        }
+
+        .text-button-mobilisation.active {
+            background: none;
+            border-radius: 25px;
+            color: #6c63ff;;
+            border: 2px solid #6c63ff;;
+            padding-top: 7px;
+            padding-bottom: 7px;
+            padding-left: 12px;
+            padding-right: 12px;
+        }
+
+        .text-button-kräftigung {
+            border: none;
+            background: none;
+            color: #6c63ff;;
+        }
+
+        .text-button-kräftigung.active {
+            background: none;
+            border-radius: 25px;
+            color: #6c63ff;;
+            border: 2px solid #6c63ff;;
+            padding-top: 7px;
+            padding-bottom: 7px;
+            padding-left: 12px;
+            padding-right: 12px;
+        }
+
+        .text-button-dehnung {
+            border: none;
+            background: none;
+            color: #6c63ff;;
+        }
+
+        .text-button-dehnung.active {
+            background: none;
+            border-radius: 25px;
+            color: #6c63ff;;
+            border: 2px solid #6c63ff;;
+            padding-top: 7px;
+            padding-bottom: 7px;
+            padding-left: 12px;
+            padding-right: 12px;
+        }
+
+        .text-button-alles {
+            border: none;
+            background: none;
+            color: #6c63ff;;
+        }
+
+        .text-button-alles.active {
+            background: none;
+            border-radius: 25px;
+            color: #6c63ff;;
+            border: 2px solid #6c63ff;;
+            padding-top: 7px;
+            padding-bottom: 7px;
+            padding-left: 12px;
+            padding-right: 12px;
+        }
+
+        .row-basti-addplan {
+            justify-content: start;
+            flex-direction: row;
+            align-items: center;
+            display: flex;
+        }
+
+        .row-basti-addplan.active {
+            justify-content: start;
+            flex-direction: row;
+            align-items: center;
+            display: flex;
+            background-color: rgba(230, 242, 255, 0.245);
+            height: 80px;
+            border-radius: 30px;
+            margin-right: 10px;
+        }
+
+        .row-basti-editplan {
+            justify-content: start;
+            flex-direction: row;
+            align-items: center;
+            display: flex;
+        }
+
+        .row-basti-editplan.active {
+            justify-content: start;
+            flex-direction: row;
+            align-items: center;
+            display: flex;
+            background-color: rgba(230, 242, 255, 0.245);
+            height: 80px;
+            border-radius: 30px;
+            margin-right: 10px;
+        }
+
+
+
+        .container-left {
+            transition: transform 0.3s ease;
+            transform: translateX(-100%);
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            border-bottom-right-radius: 12px;
+            width:220px;
+            background-color: #6c63ff;;
+            flex-direction: column;
+            align-items: center;
+            align-content: center;
+            padding-bottom: 25px;
+            padding-left: 10px;
+            justify-content: center;
+            padding-top: 25px;
+            color: white;
+            display: flex;
+            z-index: 1000;
+            padding-top: 60px;
+        }
+
+        .burger-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 30px;
+            height: 20px;
+            cursor: pointer;
+            z-index: 1001;
+            /* Ensure it's above other content */
+        }
+
+        /* Adjustments for responsiveness */
+        @media (max-width: 991px) {
+            .container-left {
+                transform: translateX(-340px);
+                flex-direction: column;
+                align-items: start;
+                align-content: start;
+                padding-bottom: 25px;
+                padding-left: 10px;
+                width: 340px;
+                justify-content: space-between;
+            }
+
+            #menu-toggle:checked~.container-left {
+                transform: translateX(0);
+            }
+
+            .container-top {
+                position: fixed;
+                top: 0;
+                left: 0;
+                display: flex;
+                right: 0;
+                height: 60px;
+                background-color: rgb(255, 255, 255) !important;
+                flex-direction: row;
+                align-items: center;
+                justify-content: end;
+            }
+
+            .container-main {
+                margin-left: 0;
+            }
+
+        }
+
+        @media (min-width: 991px) {
+            .burger-button {
+                display: none;
+            }
+
+            .container-left {
+                transform: translateX(0);
+                flex-direction: column;
+                align-items: center;
+                align-content: center;
+                padding-bottom: 25px;
+                padding-left: 10px;
+                justify-content: center;
+            }
+
+            .container-top {
+                margin-left: 175px;
+                position: fixed;
+                top: 0;
+                left: 0;
+                display: flex;
+                right: 0;
+                height: 60px;
+                margin-left: 220px;
+                background-color: rgb(255, 255, 255) !important;
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+            .container-main {
+                margin-left: 220px;
+            }
+        }
+
+        /* Burger Button Styles */
+        .burger-button span {
+            display: block;
+            width: 100%;
+            height: 3px;
+            margin: 0px;
+            background-color: black;
+            position: absolute;
+            transition: background-color 0.3s ease;
+        }
+
+        .burger-button span:nth-child(1) {
+            top: 0;
+        }
+
+        .burger-button span:nth-child(2) {
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .burger-button span:nth-child(3) {
+            bottom: 0;
+        }
+
+        /* Menu Toggle Checkbox (for demo purposes) */
+        #menu-toggle {
+            display: none;
+        }
+
+        /* Main Content Area */
+        .container-main {
+            margin-top: 40px;
+
+            padding: 20px;
+            background-color: #fff;
+        }
+    </style>
+</head>
+
+<link rel="shortcut icon" type="image/png" href="{% static 'favicon.ico' %}" />
+
+<body>
+    <!-- Burger Button -->
+    <div class="burger-button" onclick="toggleBurgerButton()">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <!-- Menu Toggle Checkbox (for demo purposes) -->
+    <input type="checkbox" id="menu-toggle">
+
+    <!-- Left Sidebar Menu -->
+    <div class="container-left">
+        <h2 style="color: white; margin-bottom: 10px; margin-top: 0; margin-right: 10px; position: absolute; top: 25px; ">
+            Dashboard
+        </h2>
+        <div
+            style="margin-right: 0px; margin-top: 20px; display: flex; flex-direction: column; justify-content: space-around;">
+            <!-- Menu Items -->
+            <div class="row-basti-home" style="padding-left: 10px; margin-bottom: 25px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-house"
+                    viewBox="0 0 16 16">
+                    <path
+                        d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L2 8.207V13.5A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5V8.207l.646.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293zM13 7.207V13.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V7.207l5-5z" />
+                </svg>
+                <a href="/hub/" style="padding-left: 20px; color: white; text-decoration: none;">Home</a>
+            </div>
+            <div class="row-basti-create-customer" style="padding-left: 10px; margin-bottom: 25px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                    class="bi bi-person-plus" viewBox="0 0 16 16">
+                    <path
+                        d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0m4 8c0 1-1 1-1 1H1s-1 0-1-1 1-4 6-4 6 3 6 4m-1-.004c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664z" />
+                    <path fill-rule="evenodd"
+                        d="M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5" />
+                </svg>
+                <a href="/create-customer/" style="padding-left: 20px; color: white; text-decoration: none;">Neuer Kunde</a>
+            </div>
+            
+
+            <div class="padding-item"></div>
+            <div style="height: 100px; "></div>
+
+            <div class="row-basti" style="padding-left: 10px; padding-bottom: 25px;position: absolute; bottom: 25px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                    class="bi bi-box-arrow-left" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd"
+                        d="M6 12.5a.5.5 0 0 0 .5.5h8a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-8a.5.5 0 0 0-.5.5v2a.5.5 0 0 1-1 0v-2A1.5 1.5 0 0 1 6.5 2h8A1.5 1.5 0 0 1 16 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-8A1.5 1.5 0 0 1 5 12.5v-2a.5.5 0 0 1 1 0z" />
+                    <path fill-rule="evenodd"
+                        d="M.146 8.354a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L1.707 7.5H10.5a.5.5 0 0 1 0 1H1.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3z" />
+                </svg>
+
+                <a href="/logout" style="color: white; margin-bottom: 20; margin-top: auto;padding-left: 20px;">
+                    Logout
+                </a>
+            </div>
+
+            <!-- Add more menu items as needed -->
+        </div>
+    </div>
+
+    <!-- Top Container -->
+    <div class="container-top">
+        <div class="padding-item">
+            <h4 style="color: #6c63ff;">
+                {% block praxisname %} Praxisname {% endblock %}
+            </h4>
+        </div>
+        <div class="padding-item">
+            <img src="{% static 'images/logo3.png' %}" alt="" style="height: 40px; width: 55px;">
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+
+
+    
+        {%block content%}
+        {%endblock content%}
+  
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+    <!-- JavaScript for toggling the menu -->
+    <script>
+        let currentPath = window.location.pathname;
+        let isPathMatched = false;
+
+        if (currentPath === '/' || currentPath === '/hub') {
+            document.querySelector('.row-basti-home').classList.add('active');
+            isPathMatched = true;
+        }
+        if (currentPath === '/create-customer/' || currentPath === '/hub/create-customer/') {
+            document.querySelector('.row-basti-create-customer').classList.add('active');
+            isPathMatched = true;
+        }
+        if (currentPath === '/settings/' || currentPath === '/hub/settings') {
+            document.querySelector('.row-basti-settings').classList.add('active');
+            isPathMatched = true;
+        }
+
+        // Wenn keiner der spezifischen Pfade zutrifft, dann .row-basti-home aktivieren
+        if (!isPathMatched) {
+            document.querySelector('.row-basti-home').classList.add('active');
+        }
+        function toggleBurgerButton() {
+            var menuToggle = document.getElementById('menu-toggle');
+            menuToggle.checked = !menuToggle.checked;
+            var button = document.querySelector('.burger-button');
+            button.classList.toggle('open');
+            var spans = button.querySelectorAll('span');
+            spans.forEach(span => {
+                if (button.classList.contains('open')) {
+                    span.style.backgroundColor = 'white'; // Farbe der Balken im geöffneten Zustand
+                } else {
+                    span.style.backgroundColor = 'black'; // Standardfarbe der Balken
+                }
+            });
+        }
+    </script>
+</body>

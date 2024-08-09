@@ -1,0 +1,168 @@
+{% extends 'chat_bot_app/main.html' %}
+{% block title %}Neuer Kunde{% endblock title %}
+{% block praxisname %}
+Neuen Kunden anlegen
+{% endblock praxisname %}
+{% load static %}
+
+{% block content %}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Customer</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            display: flex;
+            width: 80%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            background-color: white;
+            padding: 20px;
+        }
+
+        .form-container {
+            width: 100%;
+            margin: auto;
+            text-align: center;
+        }
+
+        .form-container h2 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #333;
+        }
+
+        .form-container label {
+            display: block;
+            margin-bottom: 5px;
+            text-align: left;
+            color: #777;
+        }
+
+        .form-container input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        .form-container input:focus {
+            border-color: #6c63ff;
+            outline: none;
+            box-shadow: 0 0 8px rgba(108, 99, 255, 0.2);
+        }
+
+        .form-container button {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #6c63ff;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .form-container button:hover {
+            background-color: #5753d8;
+        }
+
+        .form-container .logo-preview {
+            margin-bottom: 15px;
+        }
+
+        .logo-preview img {
+            margin-left: 20px;
+            align-items: center;
+            max-width: 100px;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="form-container">
+            <h2>Neuer Kunde</h2>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <label for="company-name">Name des Unternehmens</label>
+                <input type="text" id="company_name" name="company_name" required>
+
+                <label for="lead-email">Lead Emailadresse des Unternehmens</label>
+                <input type="email" id="lead_email" name="lead_email" required>
+
+                <label for="logo-url">Logo URL des Unternehmens</label>
+                <div style="display: flex; flex-direction: row; justify-content: space-between;">
+                    <input type="url" id="logo_url" name="logo_url" onchange="previewLogo()" required>
+                    <div class="logo-preview">
+                        <img id="logo-preview" src="" alt="Logo Vorschau">
+                    </div>
+                </div>
+
+                <label for="website-url">Website URL des Unternehmens </label>
+                <input type="url" id="website_url" name="website_url" placeholder="https://" required>
+
+                <label for="color-picker">Farbe für Chat auswählen</label>
+                <input type="color" id="color_code" name="color_code" value="#6c63ff">
+
+                <label for="color-picker">Akzent-Farbe für Chat auswählen</label>
+                <input type="color" id="accent_color" name="accent_color" value="#1A1740">
+
+                <label for="subscription_model">Subscription Model</label>
+                <select id="subscription_model" name="subscription_model"
+                    style="height: 50px; width: 100%; border-radius: 5px;">
+                    <option value="model_1">Model 1</option>
+                    <option value="model_2">Model 2</option>
+                    <option value="model_3">Model 3</option>
+                </select>
+
+                <div style="height: 30px;">
+
+                </div>
+                <label for="file_upload">Zusätzliche Kontext Files</label>
+                <input type="file" id="file_upload" name="file_upload">
+
+                <button type="submit">Erstellen</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function previewLogo() {
+            const logoUrl = document.getElementById('logo_url').value;
+            const logoPreview = document.getElementById('logo-preview');
+
+            if (logoUrl) {
+                logoPreview.src = logoUrl;
+
+                logoPreview.style.display = 'block';
+            } else {
+                logoPreview.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+
+</html>
+{% endblock content %}

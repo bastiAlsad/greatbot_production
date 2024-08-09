@@ -1,0 +1,22 @@
+ProViral is a digital agency based in Potsdam, Germany, specializing in the development of bespoke Webflow and Shopify websites. Their services cater to both startups and established small businesses, focusing on creating high-performance, user-friendly websites tailored to the client's unique needs.
+
+### Products and Services:
+ProViral offers a comprehensive suite of services with a specialization in Webflow and Shopify development. Key services include:
+
+1. **Web Design with Figma**: The company utilizes Figma to design modern, high-quality websites. They also offer branding services to create cohesive visual identities for their clients  .
+2. **Webflow & Shopify Development**: ProViral develops client designs on Webflow or Shopify platforms and offers the flexibility to merge both platforms by using Webflow for the front-end and Shopify for the back-end  .
+3. **Launch and Maintenance Services**: The agency assists clients with website launches while preserving SEO rankings. They set up necessary redirects and domain connections. Post-launch, they provide SEO services to maintain and improve the website's performance  .
+
+### Advantages:
+ProViral positions itself as a growth and marketing hybrid agency, aiming to not just build websites, but also enhance client businesses by helping in areas like staff recruitment, e-commerce scaling, and customer acquisition. They emphasize delivering results through their websites and offer their services at fixed prices, which helps clients budget effectively   .
+
+### Team and Approach:
+The company collaborates closely with small businesses to understand their specific challenges and goals. They offer creative and effective solutions tailored to each client's unique needs, helping them succeed in a competitive environment. This personalized approach highlights their commitment to client success and fostering long-term partnerships  .
+
+### Pricing:
+The cost of ProViral’s services varies based on the project's complexity. Prices for simple websites start at around €2,000, while more complex projects can range from €5,000 to over €10,000. They encourage potential clients to discuss their specific requirements to get a precise estimate  .
+
+### Contact Information:
+Clients can reach ProViral via email at info@proviral.de or by phone at +49 (0) 1512 2068 2729. They also provide a contact form on their website for inquiries and project kick-offs, making it easy for clients to get in touch and start their projects  .
+
+ProViral's blend of design expertise, technical capability, and personalized client service marks them as a notable agency in the web development space, particularly for businesses looking to leverage Webflow and Shopify platforms.

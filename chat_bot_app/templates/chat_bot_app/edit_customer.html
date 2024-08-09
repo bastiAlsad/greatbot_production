@@ -1,0 +1,502 @@
+{% extends 'chat_bot_app/main.html' %}
+{% block title %}Kunde bearbeiten{% endblock title %}
+{% block praxisname %}Kunden bearbeiten{% endblock praxisname %}
+{% load static %}
+
+{% block content %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kunde bearbeiten</title>
+    <style>
+        body {
+            padding-top: 90px;
+            display: flex;
+            flex-direction: column;
+            justify-content: start;
+            align-items: start;
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            display: flex;
+            width: 90%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            background-color: white;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-container {
+            width: 100%;
+            margin: auto;
+            text-align: left;
+        }
+
+        .form-container h2 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #333;
+        }
+
+        .form-container label {
+            display: block;
+            margin-bottom: 5px;
+            text-align: left;
+            color: #777;
+        }
+
+        .form-container input,
+        .form-container select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        .form-container input:focus,
+        .form-container select:focus {
+            border-color: #6c63ff;
+            outline: none;
+            box-shadow: 0 0 8px rgba(108, 99, 255, 0.2);
+        }
+
+        .form-container button {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #6c63ff;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .form-container button:hover {
+            background-color: #5753d8;
+        }
+
+        .logo-preview img {
+            margin-left: 20px;
+            align-items: center;
+            max-width: 100px;
+            display: none;
+        }
+
+        .chart-container {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="form-container">
+            <h2>Chatbot Einstellungen:</h2>
+            <label for="company-name">Chatbot Url:</label>
+            <div style="display: flex; flex-direction: row; justify-content: space-between;">
+                <input type="url" id="chatbot_url" name="chatbot_url" readonly value="{{customer.chatbot_url}}">
+                <div style="margin-left: 20px; margin-top: 5px; position: relative;">
+                    <svg id="copy-btn" xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+                        class="bi bi-copy" viewBox="0 0 16 16" style="cursor: pointer;">
+                        <path fill-rule="evenodd"
+                            d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1z" />
+                    </svg>
+                    <div id="copy-confirmation"
+                        style="display: none; position: absolute; top: -30px; left: 50%; transform: translateX(-50%); background-color: #6c63ff; color: white; padding: 5px 10px; border-radius: 5px; font-size: 14px;">
+                        Kopiert!
+                    </div>
+                </div>
+            </div>
+            <label for="company-name">CSS Url:</label>
+            <div style="display: flex; flex-direction: row; justify-content: space-between;">
+                <input type="url" id="css_url" name="css_url" readonly value="{{customer.css_url}}">
+                <div style="margin-left: 20px; margin-top: 5px; position: relative;">
+                    <svg id="copy-btn1" xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+                        class="bi bi-copy" viewBox="0 0 16 16" style="cursor: pointer;">
+                        <path fill-rule="evenodd"
+                            d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1z" />
+                    </svg>
+                    <div id="copy-confirmation1"
+                        style="display: none; position: absolute; top: -30px; left: 50%; transform: translateX(-50%); background-color: #6c63ff; color: white; padding: 5px 10px; border-radius: 5px; font-size: 14px;">
+                        Kopiert!
+                    </div>
+                </div>
+            </div>
+            <label for="company-name">JS Url:</label>
+            <div style="display: flex; flex-direction: row; justify-content: space-between;">
+                <input type="url" id="js_url" name="js_url" readonly value="{{customer.js_url}}">
+                <div style="margin-left: 20px; margin-top: 5px; position: relative;">
+                    <svg id="copy-btn2" xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+                        class="bi bi-copy" viewBox="0 0 16 16" style="cursor: pointer;">
+                        <path fill-rule="evenodd"
+                            d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1z" />
+                    </svg>
+                    <div id="copy-confirmation2"
+                        style="display: none; position: absolute; top: -30px; left: 50%; transform: translateX(-50%); background-color: #6c63ff; color: white; padding: 5px 10px; border-radius: 5px; font-size: 14px;">
+                        Kopiert!
+                    </div>
+                </div>
+            </div>
+            <label for="company-name">Send Message Url:</label>
+            <div style="display: flex; flex-direction: row; justify-content: space-between;">
+                <input type="url" id="send_message_url" name="send_message_url" readonly value="{{customer.send_message_url}}">
+                <div style="margin-left: 20px; margin-top: 5px; position: relative;">
+                    <svg id="copy-btn3" xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+                        class="bi bi-copy" viewBox="0 0 16 16" style="cursor: pointer;">
+                        <path fill-rule="evenodd"
+                            d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1z" />
+                    </svg>
+                    <div id="copy-confirmation3"
+                        style="display: none; position: absolute; top: -30px; left: 50%; transform: translateX(-50%); background-color: #6c63ff; color: white; padding: 5px 10px; border-radius: 5px; font-size: 14px;">
+                        Kopiert!
+                    </div>
+                </div>
+            </div>
+            <label for="company-name">Save User Data Url:</label>
+            <div style="display: flex; flex-direction: row; justify-content: space-between;">
+                <input type="url" id="save_user_data_url" name="save_user_data_url" readonly value="{{customer.save_user_data_url}}">
+                <div style="margin-left: 20px; margin-top: 5px; position: relative;">
+                    <svg id="copy-btn4" xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+                        class="bi bi-copy" viewBox="0 0 16 16" style="cursor: pointer;">
+                        <path fill-rule="evenodd"
+                            d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1z" />
+                    </svg>
+                    <div id="copy-confirmation4"
+                        style="display: none; position: absolute; top: -30px; left: 50%; transform: translateX(-50%); background-color: #6c63ff; color: white; padding: 5px 10px; border-radius: 5px; font-size: 14px;">
+                        Kopiert!
+                    </div>
+                </div>
+            </div>
+            <label for="subscription_model">Subscription Model</label>
+            <select id="subscription_model" name="subscription_model"
+                style="height: 50px; width: 100%; border-radius: 5px;">
+                <option value="model_1">Model 1</option>
+                <option value="model_2">Model 2</option>
+                <option value="model_3">Model 3</option>
+            </select>
+        </div>
+    </div>
+
+    <div style="height: 60px;"></div>
+    <div class="container">
+        <div class="form-container">
+            <h2>Unternehmens Einstellungen:</h2>
+            <label for="company_name">Name des Unternehmens</label>
+            <input type="text" id="company_name" name="company_name" value="{{customer.company_name}}" readonly>
+
+            <label for="lead_email">Lead Emailadresse des Unternehmens</label>
+            <input type="email" id="lead_email" name="lead_email" value="{{customer.lead_email}}" required>
+
+            <label for="logo_url">Logo URL des Unternehmens</label>
+            <div style="display: flex; flex-direction: row; justify-content: space-between;">
+                <input type="url" id="logo_url" name="logo_url" onchange="previewLogo()" value="{{customer.logo_url}}"
+                    required>
+                <div class="logo-preview">
+                    <img id="logo-preview" src="" alt="Logo Vorschau">
+                </div>
+            </div>
+
+            <label for="website_url">Website URL des Unternehmens</label>
+            <input type="url" id="website_url" name="website_url" placeholder="https://" required
+                value="{{customer.website_url}}">
+
+            <label for="color_code">Farbe für Chat auswählen</label>
+            <input type="color" id="color_code" name="color_code" value="{{customer.color_code}}">
+            <label for="color-picker">Akzent-Farbe für Chat auswählen</label>
+                <input type="color" id="accent_color" name="accent_color" value="{{customer.accent_color}}">
+        </div>
+    </div>
+
+    <div style="height: 60px;"></div>
+    <div class="container">
+        <div class="form-container">
+            <h2>Statistiken:</h2>
+            <label for="monthly_requests">Anfragen (insgesamt):</label>
+            <h3>{{request_count}}</h3>
+
+            <label for="bot_users">Nutzer des Chatbots (insgesamt):</label>
+            <h3>{{user_count}}</h3>
+
+            <label for="generated_leads">Generierte Leads (insgesamt):</label>
+            <h3>{{leads_count}}</h3>
+
+            <label for="conversion_rate">Conversion Rate (insgesamt):</label>
+            <h3>{{conversion_rate}}%</h3>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="form-container">
+            <h2>Statistiken:</h2>
+
+            <label for="time-period">Zeitraum wählen:</label>
+            <select id="time-period">
+                <option value="total">Gesamt</option>
+                <option value="week">Woche</option>
+                <option value="month">Monat</option>
+                <option value="year">Jahr</option>
+            </select>
+
+            <div class="chart-container">
+                <canvas id="requestsChart"></canvas>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="usersChart"></canvas>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="leadsChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="topQuestionsChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <script>
+        const requestData = JSON.parse('{{ request_data|safe|escapejs }}');
+        const userData = JSON.parse('{{ user_data|safe|escapejs }}');
+        const leadData = JSON.parse('{{ lead_data|safe|escapejs }}');
+        const topQuestionsData = JSON.parse('{{ top_questions_data|safe|escapejs }}');
+
+    const topQuestionsChartCtx = document.getElementById('topQuestionsChart').getContext('2d');
+    new Chart(topQuestionsChartCtx, {
+        type: 'bar',
+        data: {
+            labels: topQuestionsData.map(entry => entry.themenbereich),
+            datasets: [{
+                label: 'Fragenanzahl',
+                data: topQuestionsData.map(entry => entry.amount),
+                backgroundColor: 'rgb(108, 99, 255)',
+                borderColor: 'rgb(108, 99, 255)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Fragen'
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Anzahl'
+                    }
+                }
+            }
+        }
+    });
+
+
+
+        function createChart(ctx, label, data, unit = 'day') {
+            return new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.map(entry => entry.day || entry.month),
+                    datasets: [{
+                        label: label,
+                        data: data.map(entry => entry.count),
+                        borderColor: 'rgb(108, 99, 255)',
+                        backgroundColor: 'rgb(108, 99, 255)',
+                        fill: false,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: {
+                                unit: unit
+                            },
+                            title: {
+                                display: true,
+                                text: 'Datum'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Anzahl'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        const requestsChartCtx = document.getElementById('requestsChart').getContext('2d');
+        const requestsChart = createChart(requestsChartCtx, 'Anfragen', requestData.total);
+
+        const usersChartCtx = document.getElementById('usersChart').getContext('2d');
+        const usersChart = createChart(usersChartCtx, 'Nutzer', userData.total);
+
+        const leadsChartCtx = document.getElementById('leadsChart').getContext('2d');
+        const leadsChart = createChart(leadsChartCtx, 'Leads', leadData.total);
+
+        document.getElementById('time-period').addEventListener('change', function () {
+            const period = this.value;
+
+            updateChart(requestsChart, requestData[period], period);
+            updateChart(usersChart, userData[period], period);
+            updateChart(leadsChart, leadData[period], period);
+        });
+
+        function updateChart(chart, data, period) {
+            chart.data.labels = data.map(entry => entry.day || entry.month);
+            chart.data.datasets[0].data = data.map(entry => entry.count);
+
+            if (period === 'year') {
+                chart.options.scales.x.time.unit = 'month';
+            } else {
+                chart.options.scales.x.time.unit = 'day';
+            }
+
+            chart.update();
+        }
+        
+        
+
+        document.getElementById('copy-btn').addEventListener('click', function () {
+            const urlField = document.getElementById('chatbot_url');
+            urlField.select();
+            urlField.setSelectionRange(0, 99999); // For mobile devices
+            navigator.clipboard.writeText(urlField.value);
+
+            const confirmation = document.getElementById('copy-confirmation');
+            confirmation.style.display = 'block';
+            setTimeout(() => {
+                confirmation.style.display = 'none';
+            }, 2000);
+        });
+
+        document.getElementById('copy-btn1').addEventListener('click', function () {
+            const urlField = document.getElementById('css_url');
+            urlField.select();
+            urlField.setSelectionRange(0, 99999); // For mobile devices
+            navigator.clipboard.writeText(urlField.value);
+
+            const confirmation = document.getElementById('copy-confirmation1');
+            confirmation.style.display = 'block';
+            setTimeout(() => {
+                confirmation.style.display = 'none';
+            }, 2000);
+        });
+
+        document.getElementById('copy-btn2').addEventListener('click', function () {
+            const urlField = document.getElementById('js_url');
+            urlField.select();
+            urlField.setSelectionRange(0, 99999); // For mobile devices
+            navigator.clipboard.writeText(urlField.value);
+
+            const confirmation = document.getElementById('copy-confirmation2');
+            confirmation.style.display = 'block';
+            setTimeout(() => {
+                confirmation.style.display = 'none';
+            }, 2000);
+        });
+
+        document.getElementById('copy-btn3').addEventListener('click', function () {
+            const urlField = document.getElementById('send_message_url');
+            urlField.select();
+            urlField.setSelectionRange(0, 99999); // For mobile devices
+            navigator.clipboard.writeText(urlField.value);
+
+            const confirmation = document.getElementById('copy-confirmation3');
+            confirmation.style.display = 'block';
+            setTimeout(() => {
+                confirmation.style.display = 'none';
+            }, 2000);
+        });
+
+        document.getElementById('copy-btn4').addEventListener('click', function () {
+            const urlField = document.getElementById('save_user_data_url');
+            urlField.select();
+            urlField.setSelectionRange(0, 99999); // For mobile devices
+            navigator.clipboard.writeText(urlField.value);
+
+            const confirmation = document.getElementById('copy-confirmation4');
+            confirmation.style.display = 'block';
+            setTimeout(() => {
+                confirmation.style.display = 'none';
+            }, 2000);
+        });
+
+        function previewLogo() {
+            const logoUrl = document.getElementById('logo_url').value;
+            const logoPreview = document.getElementById('logo-preview');
+            if (logoUrl) {
+                logoPreview.src = logoUrl;
+                logoPreview.style.display = 'block';
+            } else {
+                logoPreview.style.display = 'none';
+            }
+        }
+
+        // Helper function to send AJAX request
+        function sendUpdate(fieldName, fieldValue) {
+            fetch('/update_customer/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({
+                    'customer_id': '{{customer.id}}',
+                    'field': fieldName,
+                    'value': fieldValue
+                })
+            }).then(response => {
+                if (!response.ok) {
+                    alert('Failed to update ' + fieldName);
+                }
+            }).catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while updating ' + fieldName);
+            });
+        }
+
+        // Event listeners for input fields
+        document.querySelectorAll('input, select').forEach(element => {
+            element.addEventListener('change', (event) => {
+                sendUpdate(event.target.name, event.target.value);
+            });
+        });
+
+        // Initialize subscription model
+        document.getElementById('subscription_model').value = '{{customer.subscription_model}}';
+
+
+    </script>
+</body>
+
+</html>
+
+{% endblock content %}

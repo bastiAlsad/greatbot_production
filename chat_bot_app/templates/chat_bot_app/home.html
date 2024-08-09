@@ -1,0 +1,187 @@
+{% extends 'chat_bot_app/main.html' %}
+{% block title %}Home{% endblock title %}
+{% block praxisname %}
+{{ user.username }}
+{% endblock praxisname %}
+
+{% block content %}
+<div class="container-main">
+    <style>
+        .analyse-container {
+            border-radius: 13px;
+            background-color: white;
+            width: 20vw;
+            height: 200px;
+            padding: 30px;
+            justify-content: start;
+            flex-direction: row;
+            display: flex;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .analyse-column {
+            justify-content: space-between;
+            align-items: start;
+            justify-items: start;
+            flex-direction: column;
+            padding-left: 30px;
+            display: flex;
+        }
+
+        .customer-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 30px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            
+        }
+
+        .customer-table th,
+        .customer-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .customer-table th {
+            background-color: #6c63ff;
+            color: white;
+        }
+
+        .customer-table tr {
+            transition: background-color 0.3s;
+        }
+
+        .customer-table tr:hover {
+            background-color: #f1f1f1;
+            cursor: pointer;
+        }
+
+        .customer-table img {
+            max-width: 50px;
+            border-radius: 5px;
+        }
+
+        .scrollable-container {
+            max-height: 400px;
+            overflow-y: auto;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+
+    </style>
+
+    {% if is_superuser %}
+    <button class="special-button" style="background-color: #6c63ff; margin-left: 30px; width: 200px;" onclick="fetchAdminPower()">
+        Admin Power
+    </button>
+    {% endif %}
+
+    <div class="row-basti" style="justify-content: space-between; width: 90%; padding-left: 30px; margin-top: 15px;">
+        <div class="analyse-container">
+            <div style="height: 140px; width: 5px; background-color: #6c63ff; border-radius: 10px;"></div>
+            <div class="analyse-column">
+                <h3 style="color: #6c63ff;">Kunden</h3>
+                <div></div>
+                <div style="font-size: 20px; color: grey;">{{ user_amount }}</div>
+                <div style="flex-direction: row; display: flex; justify-content: space-around; align-items: center;">
+                    insgesamt
+                </div>
+            </div>
+        </div>
+
+        <div class="analyse-container">
+            <div style="height: 140px; width: 5px; background-color: #6c63ff; border-radius: 10px;"></div>
+            <div class="analyse-column">
+                <h3 style="color: #6c63ff;">Leads</h3>
+                <div></div>
+                <div style="font-size: 20px; color: grey;">{{ active_user_amount }}</div>
+                <div style="flex-direction: row; display: flex; justify-content: space-around; align-items: center;">
+                    insgesamt
+                </div>
+            </div>
+        </div>
+
+        <div class="analyse-container">
+            <div style="height: 140px; width: 5px; background-color: #6c63ff; border-radius: 10px;"></div>
+            <div class="analyse-column">
+                <h3 style="color: #6c63ff;">Neuer Kunde</h3>
+                <button style="background: none; border: none;" onclick="create_customer()">
+                    <div>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="70" height="70" fill="currentColor" class="bi bi-person-plus" viewBox="0 0 16 16">
+                            <path fill="#6c63ff" d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0m4 8c0 1-1 1-1 1H1s-1 0-1-1 1-4 6-4 6 3 6 4m-1-.004c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664z" />
+                            <path fill="#6c63ff" fill-rule="evenodd" d="M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5" />
+                        </svg>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="padding-item"></div>
+
+    <div style="padding-left: 30px; padding-right: 30px; padding-top: 60px; background: none;">
+        <h4 style="color: #6c63ff;">
+            Ihre Kunden:
+        </h4>
+        
+            <table class="customer-table">
+                <thead>
+                    <tr>
+                        <th>Logo</th>
+                        <th>Unternehmensname</th>
+                        <th>Lead Email</th>
+                        <th>Website URL</th>
+                        <th>Aktionen</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for customer in customers %}
+                    <tr onclick="edit_customer('{{ customer.id }}')">
+                        <td><img src="{{ customer.logo_url }}" alt="Logo"></td>
+                        <td>{{ customer.company_name }}</td>
+                        <td>{{ customer.lead_email }}</td>
+                        <td><a href="{{ customer.website_url }}" target="_blank">{{ customer.website_url }}</a></td>
+                        <td>
+                            <button class="delete-button" onclick="event.stopPropagation(); delete_customer('{{ customer.id }}');"><svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                                <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5m-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5M4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06m6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528M8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5"/>
+                              </svg></button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        
+    </div>
+</div>
+
+<script>
+    function fetchAdminPower() {
+        let token = "{{ csrf_token }}";
+        fetch("trigger-admin-power", {
+            headers: {
+                'X-CSRFToken': token,
+            },
+            method: "GET"
+        });
+    }
+
+    function create_customer() {
+        window.location.href = "create-customer/";
+    }
+
+    function edit_customer(id) {
+        window.location.href = "edit-customer/" + id;
+    }
+
+    function delete_customer(id) {
+        if (confirm("Sind Sie sicher, dass Sie diesen Kunden löschen möchten?")) {
+            window.location.href = "delete-customer/" + id;
+        }
+    }
+</script>
+{% endblock content %}
