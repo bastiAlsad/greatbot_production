@@ -120,8 +120,11 @@ Neuen Kunden anlegen
                     </div>
                 </div>
 
-                <label for="website-url">Website URL des Unternehmens </label>
-                <input type="url" id="website_url" name="website_url" placeholder="https://" required>
+                <label for="file_upload">Informationen über das Unternehmen</label>
+                <input type="file" id="file_upload" name="file_upload" required accept=".txt">
+
+                <!-- <label for="website-url">Website URL des Unternehmens </label>
+                <input type="url" id="website_url" name="website_url" placeholder="https://" required> -->
 
                 <label for="color-picker">Farbe für Chat auswählen</label>
                 <input type="color" id="color_code" name="color_code" value="#6c63ff">
@@ -136,13 +139,8 @@ Neuen Kunden anlegen
                     <option value="model_2">Model 2</option>
                     <option value="model_3">Model 3</option>
                 </select>
-
                 <div style="height: 30px;">
-
                 </div>
-                <label for="file_upload">Zusätzliche Kontext Files</label>
-                <input type="file" id="file_upload" name="file_upload">
-
                 <button type="submit">Erstellen</button>
             </form>
         </div>
@@ -161,6 +159,22 @@ Neuen Kunden anlegen
                 logoPreview.style.display = 'none';
             }
         }
+        document.getElementById('file_upload').addEventListener('change', function () {
+            var fileInput = this;
+
+            // Check if more than one file is selected
+            if (fileInput.files.length > 1) {
+                alert("Du darfst nur eine Datei hochladen.");
+                fileInput.value = ""; // Reset the file input
+            }
+
+            // Optionale Validierung für Dateityp
+            var allowedExtensions = /(\.txt)$/i;
+            if (!allowedExtensions.exec(fileInput.value)) {
+                alert('Bitte lade nur Txt-Dateien hoch.');
+                fileInput.value = ''; // Reset the file input
+            }
+        });
     </script>
 </body>
 

@@ -1,0 +1,31 @@
+<div id="chatbot-container">
+    <meta name="csrf-token-greatbot-ai" content="{{ csrf_token }}">
+    <!-- partner namen eintragen in -->
+    <!-- <meta name="send-message-url-greatbot-ai" content="sendmessage">
+    <meta name="save-user-data-url-greatbot-ai" content="saveuserdata"> -->
+
+    <link rel="stylesheet" type="text/css" href="{% url 'dynamic_css' partner=partner_name %}">
+    <div id="chatbot">
+        <div id="chatbot-button" onclick="toggleChat()">💬</div>
+        <div id="chatbot-window">
+            <div class="chat-header">
+                <button class="back-button" onclick="toggleChat()">X</button>
+                Chat Assistant
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <div class="message received">
+                    <div class="text">
+                        <h4>Hey! Herzlich willkommen 👋🏼</h4>
+                        Ich bin Greatbot und beantworte Ihnen gerne alle Fragen zu unseren Leistungen und unserem
+                        Unternehmen laxout - wie kann ich Ihnen helfen?
+                    </div>
+                </div>
+            </div>
+            <div class="chat-input">
+                <input type="text" id="messageInput" placeholder="Fragen Sie etwas...">
+                <button onclick="sendMessage()">Senden</button>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="{% url 'dynamic_js' partner=partner_name %}"></script>
+</div>

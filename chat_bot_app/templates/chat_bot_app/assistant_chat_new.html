@@ -1,0 +1,313 @@
+
+
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fullscreen Chat UI</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #000; /* Set the background color */
+        }
+
+        .chat-container {
+            width: 375px;
+            height: 812px;
+            border-radius: 15px;
+            background-color: #1A1A2E;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background-color: #241859;
+            padding: 10px;
+            color: #fff;
+            text-align: center;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .chat-header .status {
+            font-size: 12px;
+            color: #00FF00;
+            margin-right: 5px;
+        }
+
+        .chat-messages {
+            flex-grow: 1;
+            padding: 10px;
+            overflow-y: auto;
+            background-color: #121212;
+        }
+
+        .message {
+            margin: 10px 0;
+            display: flex;
+        }
+
+        .message.sent {
+            justify-content: flex-end;
+        }
+
+        .message.received {
+            justify-content: flex-start;
+        }
+
+        .message .text {
+            max-width: 70%;
+            padding: 10px;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .message.sent .text {
+            background-color: #4E5D94;
+        }
+
+        .message.received .text {
+            background-color: #2C2C54;
+        }
+
+        .chat-input {
+            padding: 10px;
+            background-color: #241859;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chat-input input[type="text"] {
+            flex-grow: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            margin-right: 10px;
+            font-size: 14px;
+        }
+
+        .chat-input button {
+            background-color: #4E5D94;
+            border: none;
+            padding: 10px 20px;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .chat-input button:hover {
+            background-color: #3B4A7F;
+        }
+
+        .loading-dots span {
+            animation: blink 1s infinite;
+            animation-delay: calc(0.3s * var(--i));
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <span>greatbot.ai</span>
+            <div class="status">Online</div>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+            <div class="message received">
+                <div class="text">Hey! Herzlich willkommen 👋 Ich bin Greatbot und beantworte Ihnen gerne alle Fragen zu unseren Leistungen und unserem Unternehmen laxout - wie kann ich Ihnen helfen?</div>
+            </div>
+            <div class="message sent">
+                <div class="text">Hallo</div>
+            </div>
+            <div class="message received">
+                <div class="text">Hallo! Wie kann ich Ihnen helfen?</div>
+            </div>
+            <div class="message sent">
+                <div class="text">Wer ist der Inhaber von Laxout?</div>
+            </div>
+            <div class="message received">
+                <div class="text">Der Inhaber von Laxout wird in den Informationen als Bastian Friedrich angegeben. Er wird als verantwortliche Person für den Inhalt der Webseite erwähnt, was ihn zu einer zentralen Figur in den Operationen von Laxout macht...</div>
+            </div>
+        </div>
+
+        <div class="chat-input">
+            <input type="text" id="messageInput" placeholder="Schreiben Sie eine Nachricht...">
+            <button type="button" onclick="sendMessage()">Senden</button>
+        </div>
+    </div>
+
+    
+    <script>
+        var id_count = 0;
+        var uid = "";
+        var chatbotResponses = 0;
+
+        function sendPersonalData() {
+            var name = document.getElementById("chatbot_user_name").value;
+            var email = document.getElementById("chatbot_user_email").value;
+
+            if (name.trim() !== "" && email.trim() !== "") {
+                // Prepare and send the request
+                let token = "{{ csrf_token }}";
+                let formedData = new FormData();
+                formedData.append("name", name);
+                formedData.append("email", email);
+                formedData.append("uid", uid);
+
+                fetch("saveuserdata/", {
+                    method: "POST",
+                    headers: {
+                        'X-CSRFToken': token,
+                    },
+                    body: formedData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Show thank you message
+                        const chatMessages = document.getElementById("chatMessages");
+                        const thankYouMessageElement = document.createElement("div");
+                        thankYouMessageElement.classList.add("message", "received");
+                        thankYouMessageElement.innerHTML = '<div class="text">Vielen Dank ! Es wird sich zeitnah jemand bei Ihnen melden. Wenn ich Ihnen sonst noch behilflich sein kann, fragen Sie gerne weiter.</div>';
+                        chatMessages.appendChild(thankYouMessageElement);
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                });
+            }
+        }
+
+        function sendMessage() {
+            var messageInput = document.getElementById("messageInput");
+            var message = messageInput.value;
+            if (message.trim() !== "") {
+                const chatMessages = document.getElementById("chatMessages");
+                const messageId = id_count; // Store the current id_count for the new message
+
+                // Create and append user message element
+                const userMessageElement = createMessageElement(message, "sent");
+                chatMessages.appendChild(userMessageElement);
+
+                // Create and append loading message element
+                const assistantMessageElement = createMessageElement("...", "received", "loading_message" + messageId);
+                chatMessages.appendChild(assistantMessageElement);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+
+                messageInput.value = "";
+
+                // Prepare and send the request
+                let token = "{{ csrf_token }}";
+                let formedData = new FormData();
+                formedData.append("message", message);
+                formedData.append("uid", uid);
+                formedData.append("chatbotResponses",chatbotResponses);
+
+                fetch("sendmessage/", {
+                    method: "POST",
+                    headers: {
+                        'X-CSRFToken': token,
+                    },
+                    body: formedData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.uid) {
+                        uid = data.uid;
+                        console.log(uid);
+                    }
+                    if (data.answer_chat_assistant) {
+                        // Update the correct loading message element
+                        const loadingMessageElement = document.getElementById("loading_message" + messageId);
+                        if (loadingMessageElement) {
+                            loadingMessageElement.innerHTML = createMessageElement(data.answer_chat_assistant, "received").innerHTML;
+                            loadingMessageElement.removeAttribute("id"); // Remove id after updating
+                            chatMessages.scrollTop = chatMessages.scrollHeight;
+                        }
+                        
+                        chatbotResponses++;
+                        if (chatbotResponses == 2) {
+                            addContactForm();
+                        }
+                    }
+                    id_count++; // Increment the id_count for the next message
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    // Optionally update the loading message with an error message
+                    const loadingMessageElement = document.getElementById("loading_message" + messageId);
+                    if (loadingMessageElement) {
+                        loadingMessageElement.innerHTML = "Fehler bei der Verarbeitung der Anfrage";
+                        loadingMessageElement.removeAttribute("id"); // Remove id after updating
+                    }
+                });
+            }
+        }
+
+        function createMessageElement(text, type, id = null) {
+            var messageElement = document.createElement("div");
+            if (id) {
+                messageElement.id = id; // Set the provided ID
+            }
+            messageElement.classList.add("message", type);
+
+            var textElement = document.createElement("div");
+            textElement.classList.add("text");
+            if (text === "...") {
+                textElement.classList.add("loading-dots");
+                textElement.innerHTML = '<span>.</span><span>.</span><span>.</span>';
+            } else {
+                textElement.innerHTML = text;
+            }
+
+            messageElement.appendChild(textElement);
+            return messageElement;
+        }
+
+        function addContactForm() {
+            const chatMessages = document.getElementById("chatMessages");
+            const contactFormElement = document.createElement("div");
+            contactFormElement.classList.add("message", "received");
+            contactFormElement.innerHTML = `
+                <div class="text form-container">
+                    Wenn Sie möchten, kontaktieren wir Sie gerne persönlich und geben Ihnen weitere Informationen:
+                    <form style="margin-top: 15px;">
+                        <label for="chatbot_user_name">Vor und Nachname</label>
+                        <input type="text" id="chatbot_user_name" name="chatbot_user_name" required>
+                        <label for="chatbot_user_email">Email-adresse</label>
+                        <input type="email" id="chatbot_user_email" name="chatbot_user_email" required>
+                    </form>
+                    <div class="chat-input">
+                        <button type="button" onclick="sendPersonalData()">Bestätigen</button>
+                    </div>
+                </div>
+            `;
+            chatMessages.appendChild(contactFormElement);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+    </script>
+</body>
+
+</html>

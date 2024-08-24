@@ -22,11 +22,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: don't run with debug turned on in production!
-OPENAI_API_KEY = "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"
+OPENAI_API_KEY = "sk-1PNWKk7nQmVlKUWQwB0OOHASbKxAxpyrrg10guxhfBT3BlbkFJ7I6eYjm80xSG1waivGEsAxlsY1KkS02PxGqXE97J4A"
 # Laden des Django Secret Keys
 SECRET_KEY = "a<s45fasf68af7/2090!32445##21324!/&assfasmnxcjhjhapüfsdaf"
-AZURE_API_KEY = ""
-AZURE_END_POINT = ""
+AZURE_API_KEY = "f45006b2ec9f49d8937bb220c91816b8"
+AZURE_END_POINT = "https://laxoutfinetuning.openai.azure.com/"
 DEBUG = True
 
 ALLOWED_HOSTS = ["*"]

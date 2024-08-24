@@ -5,24 +5,26 @@ from openai import OpenAI, AssistantEventHandler, AzureOpenAI
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from . import models, crawl_url
-import json
+import re
 from typing_extensions import override
 from uuid import uuid4
 import os
+import time
 
 client = OpenAI(api_key=settings.OPENAI_API_KEY)
 
 client_azure = AzureOpenAI(
     api_key=settings.AZURE_API_KEY,
-    api_version="2024-05-01-preview",
     azure_endpoint=settings.AZURE_END_POINT,
+    api_version="2024-05-01-preview",
 )
 
 
 def prepare_company_file(company_name):
     assistant_model, created = models.SummariserAssistant.objects.get_or_create(id=1)
-    if created:
-        assistant = client.beta.assistants.create(
+
+    if assistant_model.assistant_id == "" or assistant_model.assistant_id == None:
+        assistant = client_azure.beta.assistants.create(
             name="Text Assistant",
             instructions=(
                 "You are a professional writer tasked with creating a comprehensive and detailed text about a company based on the provided files. Your goal is to extract and include all relevant information, ensuring that the text answers any conceivable questions about the company. Your text should cover: Products and Services: Describe the company's products and services, including their key features and benefits Contact Information: Provide all relevant contact details, such as address, phone number, email address, and website Advantages: Highlight the unique benefits and competitive advantages of the company Team: Include information about the team, focusing on key members and their roles Pricing: If available, include information on pricing or pricing models Testimonials: Share any customer or client testimonials that reflect the company’s reputation and client satisfaction Achievements: Detail notable achievements, awards, or recognitions that the company has received History: Outline the company’s founding history, including its origin, milestones, and growth over time Locations: List the company's locations, including headquarters and any additional offices or branches Your text should be at least 600 words long and provide a thorough overview of the company, ensuring that all important aspects are covered. "
@@ -30,9 +32,15 @@ def prepare_company_file(company_name):
             model="gpt-4o",
             tools=[{"type": "file_search"}],
         )
+        print(assistant)
         assistant_model.assistant_id = assistant.id
         assistant_model.save()
-    file_paths = [f"customer_files/{company_name}.txt", "customer_files/chat_bot_creator_laxout.txt"]
+    assistant_model.assistant_id = assistant.id
+    assistant_model.save()
+    file_paths = [
+        f"customer_files/{company_name}.txt",
+        "customer_files/chat_bot_creator_laxout.txt",
+    ]
     file_streams = []
     for path in file_paths:
         if os.path.getsize(path) == 0:
@@ -75,21 +83,23 @@ def prepare_company_file(company_name):
 
 
 def create_assistant(company_name, customer_object):
-    assistant = client.beta.assistants.create(
+    assistant = client_azure.beta.assistants.create(
         name="Business Assistant",
         instructions=(
-            f"You are a helpful chat assistant for {company_name} and you answer questions of their customers and help them. Don't mention any uploaded files or sources in your responses and if you don't know an answer just refer to the contact informations."
+            f"You are a helpful chat assistant for {company_name} and you answer questions of their customers and help them. Don't mention your sources or any uploaded file ! If you don't know the answer due to lack of information just say: I'm sry but I cant respond to that question and refer to contact info."
             f"Answer in the same language as the chat partner and be very polite and nice."
         ),
         model="gpt-4o-mini",
         tools=[{"type": "file_search"}],
     )
 
-    vector_store = client.beta.vector_stores.create(name=company_name)
+    vector_store = client_azure.beta.vector_stores.create(name=company_name)
 
     print("Ausgeführt")
+    print(assistant)
+    print(customer_object.training_file_path)
 
-    file_paths = [f"customer_files/{company_name}.txt"]
+    file_paths = [customer_object.training_file_path]
 
     file_streams = []
     for path in file_paths:
@@ -103,11 +113,11 @@ def create_assistant(company_name, customer_object):
     if not file_streams:
         raise ValueError("No valid files to process.")
 
-    file_batch = client.beta.vector_stores.file_batches.upload_and_poll(
+    file_batch = client_azure.beta.vector_stores.file_batches.upload_and_poll(
         vector_store_id=vector_store.id, files=file_streams
     )
 
-    assistant = client.beta.assistants.update(
+    assistant = client_azure.beta.assistants.update(
         assistant_id=assistant.id,
         tool_resources={"file_search": {"vector_store_ids": [vector_store.id]}},
     )
@@ -163,6 +173,40 @@ def create_assistant(company_name, customer_object):
     customer_object.save_user_data_url = f"/api/{company_name}/saveuserdata/"
     customer_object.send_message_url = f"/api/{company_name}/sendmessage/"
     customer_object.save()
+    code = f"""<div id="chatbot-container">
+    <meta name="csrf-token-greatbot-ai" content="{{ csrf_token }}">
+    <!-- partner namen eintragen in -->
+    <!-- <meta name="send-message-url-greatbot-ai" content="sendmessage">
+    <meta name="save-user-data-url-greatbot-ai" content="saveuserdata"> -->
+
+    <link rel="stylesheet" type="text/css" href="{customer_object.css_url}">
+    <div id="chatbot">
+        <div id="chatbot-button" onclick="toggleChat()">💬</div>
+        <div id="chatbot-window">
+            <div class="chat-header">
+                <button class="back-button" onclick="toggleChat()">X</button>
+                Chat Assistant
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <div class="message received">
+                    <div class="text">
+                        <h4>Hey! Herzlich willkommen 👋🏼</h4>
+                        Ich bin Greatbot und beantworte Ihnen gerne alle Fragen zu unseren Leistungen und unserem
+                        Unternehmen laxout - wie kann ich Ihnen helfen?
+                    </div>
+                </div>
+            </div>
+            <div class="chat-input">
+                <input type="text" id="messageInput" placeholder="Fragen Sie etwas...">
+                <button onclick="sendMessage()">Senden</button>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="{customer_object.js_url}"></script>
+</div>"""
+    print(code)
+    customer_object.code = code
+    customer_object.save()
 
     chat_assistant = models.ChatAssistant.objects.create(created_for=customer_object)
     chat_assistant.vector_store_id = vector_store.id
@@ -197,6 +241,88 @@ def save_user_data(request, partner=None):
     return JsonResponse({"error": "Invalid request method"}, status=405)
 
 
+def upload_file_to_azure(file_path, max_wait_time=300):
+    # Lade die Datei hoch
+    response = client_azure.files.create(
+        file=open(file_path, "rb"), purpose="fine-tune"
+    )
+    file_id = response.id
+    return file_id
+
+
+def create_fine_tuning_model(company_name, customer_object):
+    # Hole den Dateipfad des hochgeladenen Trainingsdaten-Files
+    training_file_path = customer_object.training_file_path
+
+    # Beispielhafter Aufruf, um das File bei Azure hochzuladen
+    uploaded_training_file_id = upload_file_to_azure(training_file_path)
+
+    # Überprüfe den Status des hochgeladenen Files
+    while True:
+        file_status = client_azure.files.retrieve(uploaded_training_file_id)
+        if file_status.status == "processed":
+            # Erstelle den Fine-Tuning-Job
+            response = client_azure.fine_tuning.jobs.create(
+                training_file=uploaded_training_file_id,
+                model="gpt-4o-mini",
+            )
+            job_id = response.id
+
+            # Überwache den Status des Fine-Tuning-Jobs
+            while True:
+                job_status = client_azure.fine_tuning.jobs.retrieve(job_id)
+                if job_status.status == "succeeded":
+                    fine_tuned_model_id = job_status.fine_tuned_model
+                    print(
+                        f"Fine-tuning erfolgreich abgeschlossen. Modell-ID: {fine_tuned_model_id}"
+                    )
+                    models.ChatFineTuneModel.objects.create(
+                        created_for=customer_object,
+                        partner_name=company_name,
+                        fine_tuned_model_id=fine_tuned_model_id,
+                    )
+                    break
+                elif job_status.status == "failed":
+                    print("Fine-tuning ist fehlgeschlagen.")
+                    break
+                elif job_status.status == "cancelled":
+                    print("Fine-tuning wurde abgebrochen.")
+                    break
+                else:
+                    print(
+                        f"Der Jobstatus ist: {job_status.status}. Warte auf Abschluss..."
+                    )
+                time.sleep(450)  # Warten, bevor der Status erneut überprüft wird
+            break
+        elif file_status.status == "error":
+            print("Fehler beim Hochladen der Datei.")
+            break
+        else:
+            print(f"Dateistatus: {file_status.status}. Warte auf Abschluss...")
+
+        time.sleep(30)  # Warten, bevor der Status erneut überprüft wird
+
+    # URLs für den Kunden aktualisieren
+    customer_object.chatbot_url = f"/api/{company_name}/assistant-chat/"
+    customer_object.css_url = f"/api/{company_name}/dynamic-css/"
+    customer_object.js_url = f"/api/{company_name}/dynamic-js/"
+    customer_object.save_user_data_url = f"/api/{company_name}/saveuserdata/"
+    customer_object.send_message_url = f"/api/{company_name}/sendmessage/"
+    customer_object.save()
+
+    return HttpResponse("OK")
+
+
+def format_message(message):
+    message = message.replace(
+        "**",
+        "*",
+    )
+    message = re.sub(r"【\d+:\d+†source】", "", message)
+    message = re.sub(r"\s+", " ", message).strip()
+    return message
+
+
 def chatApplication(request, partner=None):
     customer = models.Customer.objects.get(company_name=partner)
 
@@ -213,6 +339,7 @@ def chatApplication(request, partner=None):
 
         try:
             assistant_instance = models.ChatAssistant.objects.get(partner_name=partner)
+            # finetune_instance = models.ChatFineTuneModel.objects.get(partner_name = partner)
             models.Request.objects.create(created_for=customer.id)
             question = request.POST.get("message")
 
@@ -229,35 +356,65 @@ def chatApplication(request, partner=None):
             )
             chat.messages.add(message_object)
 
-            # Hier erzeugst du eine neue Thread-ID für jeden neuen Chat
-            thread = client.beta.threads.create(
-                messages=[
-                    {
-                        "role": "user",
-                        "content": question,
-                    }
-                ]
-            )
+            # # Hier erzeugst du eine neue Thread-ID für jeden neuen Chat
+            try:
+                thread = client_azure.beta.threads.create(
+                    messages=[
+                        {
+                            "role": "user",
+                            "content": question,
+                        }
+                    ]
+                )
+                run = client_azure.beta.threads.runs.create_and_poll(
+                    thread_id=thread.id, assistant_id=assistant_instance.assistant_id
+                )
 
-            run = client.beta.threads.runs.create_and_poll(
-                thread_id=thread.id, assistant_id=assistant_instance.assistant_id
-            )
-
-            messages = list(
-                client.beta.threads.messages.list(thread_id=thread.id, run_id=run.id)
-            )
+                messages = list(
+                    client_azure.beta.threads.messages.list(
+                        thread_id=thread.id, run_id=run.id
+                    )
+                )
+            except Exception as e:
+                print(e)
 
             message_content = messages[0].content[0].text
+            # try:
+            #     print("Vor API-Aufruf")
+            #     print(finetune_instance.fine_tuned_model_id)
+            #     completion = client_azure.chat.completions.create(
+            #         model="gpt-4o-mini-2024-07-18-ft-ed863f5199e8459e8b1df8a56bd7eb4c",
+            #         max_tokens = 500,
+            #         messages=[
+            #             {
+            #                 "role": "system",
+            #                 "content": f"Du bist ein hilfreicher Assistent, der Fragen zu {partner} beantwortet. Du darfst nur Informationen verwenden, die während des Trainings gegeben wurden. Nutze keine allgemeinen Informationen aus dem Internet oder anderen Quellen.",
+            #             },
+            #             {
+            #                 "role": "user",
+            #                 "content": question,
+            #             },
+            #         ],
+            #     )
+            #     print("API-Aufruf erfolgreich")
+            # except Exception as e:
+            #     print(f"API-Fehler: {e}")
+            #     return JsonResponse({"error": f"API-Fehler: {e}"}, status=500)
+
+            # message_content = completion.choices[0].message.content
 
             message_object = models.ChatMessage.objects.create(
-                message=message_content.value,
+                message=format_message(message_content.value),
                 bot_message=True,
             )
             chat.messages.add(message_object)
             chat.save()
 
             return JsonResponse(
-                {"answer_chat_assistant": message_content.value, "uid": uid}
+                {
+                    "answer_chat_assistant": format_message(message_content.value),
+                    "uid": uid,
+                }
             )
 
         except Exception as e:
@@ -265,7 +422,7 @@ def chatApplication(request, partner=None):
 
     return render(
         request,
-        "chat_bot_app/index.html",
+        "chat_bot_app/chat_ui_new.html",
         {"customer": customer, "partner_name": partner},
     )
 
@@ -290,7 +447,6 @@ def generate_interest_email(question_string, name, language):
 
 
 def save_custom_embedding_code():
-   
+
     css_url = "test"
     js_url = "test"
-

@@ -38,10 +38,11 @@ class Customer(models.Model):
     css_url = models.CharField(default="", max_length=300)
     save_user_data_url = models.CharField(default="", max_length=300)
     send_message_url = models.CharField(default="", max_length=300)
+    training_file_path = models.CharField(default="", max_length=300)
+    code = models.CharField(default="", max_length=8000)
 
 class SummariserAssistant(models.Model):
     assistant_id = models.CharField(default = "", max_length=300)
-
 
 class ChatAssistant(models.Model):
     created_for = models.ForeignKey(Customer, on_delete=models.CASCADE)
@@ -49,7 +50,17 @@ class ChatAssistant(models.Model):
     assistant_id = models.CharField(default = "", max_length=300)
     vector_store_id = models.CharField(default = "", max_length=300)
 
+class ChatFineTuneModel(models.Model):
+    created_for = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    partner_name = models.CharField(default = "", max_length=300)
+    fine_tuned_model_id = models.CharField(default = "", max_length=300)
+
 class Themengebiet(models.Model):
     created_for = models.ForeignKey(Customer, on_delete=models.CASCADE)
     themenbereich = models.CharField(max_length=1155)
     amount = models.PositiveIntegerField(default=1)
+
+class FAQ(models.Model):
+    created_for = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    question = models.CharField(default="", max_length= 8000)
+    answer = models.CharField(default="", max_length=8000)
