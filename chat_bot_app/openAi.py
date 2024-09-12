@@ -11,14 +11,14 @@ from uuid import uuid4
 import os
 import time
 
-client = OpenAI(api_key=settings.OPENAI_API_KEY)
+# client = OpenAI(api_key=settings.OPENAI_API_KEY)
 
 client_azure = AzureOpenAI(
     api_key=settings.AZURE_API_KEY,
     azure_endpoint=settings.AZURE_END_POINT,
     api_version="2024-05-01-preview",
 )
-
+client = client_azure
 
 def prepare_company_file(company_name):
     assistant_model, created = models.SummariserAssistant.objects.get_or_create(id=1)
