@@ -83,162 +83,7 @@ def create_customer(request):
             logo_url=logo_url,
             accent_color=accent_color,
             created_by=request.user,
-            # website_url=website_url,
-        )
-        # crawl_url.crawl_website(website_url, company_name)
-
-        # Überprüfe, ob eine Datei hochgeladen wurde
-        if uploaded_file:
-            upload_dir = os.path.join("uploaded_files", company_name)
-            os.makedirs(upload_dir, exist_ok=True)
-
-            # Speichern der Datei
-            file_path = os.path.join(upload_dir, uploaded_file.name)
-            with open(file_path, "wb+") as destination:
-                for chunk in uploaded_file.chunks():
-                    destination.write(chunk)
-
-            # Speichere den Dateipfad in der Datenbank
-            customer.training_file_path = file_path
-        customer.save()
-
-        # openAi.prepare_company_file(company_name)
-        # openAi.create_fine_tuning_model(company_name, customer)
-        # openAi.prepare_company_file(company_name)
-        openAi.create_assistant(company_name, customer)
-
-        return redirect(f"/edit-customer/{customer.id}/")
-
-    return render(request, "chat_bot_app/create_customer.html")
-
-
-@login_required(login_url="login")
-def edit_customer(request, id=None):
-    openAi.save_custom_embedding_code()
-    customer = models.Customer.objects.get(id=id)
-    if customer is None:
-        return HttpResponse("Invalid Request")
-
-    # Counts
-    request_count = models.Request.objects.filter(created_for=customer.id).count()
-    user_count = models.ChatbotUser.objects.filter(created_for=customer.id).count()
-    leads_count = models.Lead.objects.filter(created_for=customer.id).count()
-    conversion_rate = round(leads_count / user_count * 100, 2) if user_count > 0 else 0
-
-    # Helper function to generate data for the charts
-    def get_data(model, customer_id, field_name="created_at"):
-        now = timezone.now()
-        seven_days_ago = now - timedelta(days=7)
-        one_month_ago = now - timedelta(days=30)
-        one_year_ago = now - timedelta(days=365)
-
-        total_data = (
-            model.objects.filter(created_for=customer_id)
-            .annotate(day=TruncDay(field_name))
-            .values("day")
-            .annotate(count=Count("id"))
-            .order_by("day")
-        )
-        week_data = (
-            model.objects.filter(
-                created_for=customer_id, **{field_name + "__gte": seven_days_ago}
-            )
-            .annotate(day=TruncDay(field_name))
-            .values("day")
-            .annotate(count=Count("id"))
-            .order_by("day")
-        )
-        month_data = (
-            model.objects.filter(
-                created_for=customer_id, **{field_name + "__gte": one_month_ago}
-            )
-            .annotate(day=TruncDay(field_name))
-            .values("day")
-            .annotate(count=Count("id"))
-            .order_by("day")
-        )
-        year_data = (
-            model.objects.filter(
-                created_for=customer_id, **{field_name + "__gte": one_year_ago}
-            )
-            .annotate(month=TruncMonth(field_name))
-            .values("month")
-            .annotate(count=Count("id"))
-            .order_by("month")
-        )
-
-        return {
-            "total": list(total_data),
-            "week": list(week_data),
-            "month": list(month_data),
-            "year": list(year_data),
-        }
-
-    request_data = get_data(models.Request, customer.id)
-    user_data = get_data(models.ChatbotUser, customer.id)
-    lead_data = get_data(models.Lead, customer.id)
-    top_questions = (
-        models.Themengebiet.objects.filter(created_for=customer.id)
-        .values("themenbereich")
-        .annotate(amount=Count("id"))
-        .order_by("-amount")[:7]
-    )
-
-    print(lead_data)
-
-    context = {
-        "customer": customer,
-        "leads_count": leads_count,
-        "request_count": request_count,
-        "user_count": user_count,
-        "conversion_rate": conversion_rate,
-        "request_data": json.dumps(request_data, cls=CustomJSONEncoder),
-        "user_data": json.dumps(user_data, cls=CustomJSONEncoder),
-        "lead_data": json.dumps(lead_data, cls=CustomJSONEncoder),
-        "top_questions_data": json.dumps(list(top_questions), cls=CustomJSONEncoder),
-    }
-
-    return render(request, "chat_bot_app/edit_customer.html", context)
-
-
-@login_required(login_url="login")
-def update_customer(request):
-    try:
-        data = json.loads(request.body)
-        customer_id = data["customer_id"]
-        field = data["field"]
-        value = data["value"]
-
-        customer = models.Customer.objects.get(id=customer_id)
-        setattr(customer, field, value)
-        customer.save()
-
-        return JsonResponse({"status": "success"})
-    except Exception as e:
-        return JsonResponse({"status": "error", "message": str(e)})
-
-
-@login_required(login_url="login")
-def delete_customer(request, id=None):
-    customer = models.Customer.objects.get(id=id)
-    if customer.created_by == request.user:
-        customer.delete()
-        return redirect("/hub/")
-    return redirect("/hub/")
-
-
-def dynamic_js(request, partner=None):
-    file_path = "D:/DEV/chat_bot/chat_bot/chat_bot_app/templates/chat_bot_app/greatbot.js"  # in production ändern !
-    return FileResponse(open(file_path, "rb"), content_type="application/javascript")
-
-
-def dynamic_css(request, partner=None):
-    customer = models.Customer.objects.get(company_name=partner)
-
-    print(customer.color_code)
-    print(customer.accent_color)
-
-    css = f"""
+            css_code=f"""
     :root {{
 /* Senden Button*/
             --button-text-color: white;
@@ -435,5 +280,157 @@ def dynamic_css(request, partner=None):
             line-height: 1.4;
             font-size: 14px;
         }}
-    """
+    """,
+            # website_url=website_url,
+        )
+        # crawl_url.crawl_website(website_url, company_name)
+
+        # Überprüfe, ob eine Datei hochgeladen wurde
+        if uploaded_file:
+            upload_dir = os.path.join("uploaded_files", company_name)
+            os.makedirs(upload_dir, exist_ok=True)
+
+            # Speichern der Datei
+            file_path = os.path.join(upload_dir, uploaded_file.name)
+            with open(file_path, "wb+") as destination:
+                for chunk in uploaded_file.chunks():
+                    destination.write(chunk)
+
+            # Speichere den Dateipfad in der Datenbank
+            customer.training_file_path = file_path
+        customer.save()
+
+        # openAi.prepare_company_file(company_name)
+        # openAi.create_fine_tuning_model(company_name, customer)
+        # openAi.prepare_company_file(company_name)
+        openAi.create_assistant(company_name, customer)
+
+        return redirect(f"/edit-customer/{customer.id}/")
+
+    return render(request, "chat_bot_app/create_customer.html")
+
+
+@login_required(login_url="login")
+def edit_customer(request, id=None):
+    openAi.save_custom_embedding_code()
+    customer = models.Customer.objects.get(id=id)
+    if customer is None:
+        return HttpResponse("Invalid Request")
+
+    # Counts
+    request_count = models.Request.objects.filter(created_for=customer.id).count()
+    user_count = models.ChatbotUser.objects.filter(created_for=customer.id).count()
+    leads_count = models.Lead.objects.filter(created_for=customer.id).count()
+    conversion_rate = round(leads_count / user_count * 100, 2) if user_count > 0 else 0
+
+    # Helper function to generate data for the charts
+    def get_data(model, customer_id, field_name="created_at"):
+        now = timezone.now()
+        seven_days_ago = now - timedelta(days=7)
+        one_month_ago = now - timedelta(days=30)
+        one_year_ago = now - timedelta(days=365)
+
+        total_data = (
+            model.objects.filter(created_for=customer_id)
+            .annotate(day=TruncDay(field_name))
+            .values("day")
+            .annotate(count=Count("id"))
+            .order_by("day")
+        )
+        week_data = (
+            model.objects.filter(
+                created_for=customer_id, **{field_name + "__gte": seven_days_ago}
+            )
+            .annotate(day=TruncDay(field_name))
+            .values("day")
+            .annotate(count=Count("id"))
+            .order_by("day")
+        )
+        month_data = (
+            model.objects.filter(
+                created_for=customer_id, **{field_name + "__gte": one_month_ago}
+            )
+            .annotate(day=TruncDay(field_name))
+            .values("day")
+            .annotate(count=Count("id"))
+            .order_by("day")
+        )
+        year_data = (
+            model.objects.filter(
+                created_for=customer_id, **{field_name + "__gte": one_year_ago}
+            )
+            .annotate(month=TruncMonth(field_name))
+            .values("month")
+            .annotate(count=Count("id"))
+            .order_by("month")
+        )
+
+        return {
+            "total": list(total_data),
+            "week": list(week_data),
+            "month": list(month_data),
+            "year": list(year_data),
+        }
+
+    request_data = get_data(models.Request, customer.id)
+    user_data = get_data(models.ChatbotUser, customer.id)
+    lead_data = get_data(models.Lead, customer.id)
+    top_questions = (
+        models.Themengebiet.objects.filter(created_for=customer.id)
+        .values("themenbereich")
+        .annotate(amount=Count("id"))
+        .order_by("-amount")[:7]
+    )
+
+    print(lead_data)
+
+    context = {
+        "customer": customer,
+        "leads_count": leads_count,
+        "request_count": request_count,
+        "user_count": user_count,
+        "conversion_rate": conversion_rate,
+        "request_data": json.dumps(request_data, cls=CustomJSONEncoder),
+        "user_data": json.dumps(user_data, cls=CustomJSONEncoder),
+        "lead_data": json.dumps(lead_data, cls=CustomJSONEncoder),
+        "top_questions_data": json.dumps(list(top_questions), cls=CustomJSONEncoder),
+    }
+
+    return render(request, "chat_bot_app/edit_customer.html", context)
+
+
+@login_required(login_url="login")
+def update_customer(request):
+    try:
+        data = json.loads(request.body)
+        customer_id = data["customer_id"]
+        field = data["field"]
+        value = data["value"]
+
+        customer = models.Customer.objects.get(id=customer_id)
+        setattr(customer, field, value)
+        customer.save()
+
+        return JsonResponse({"status": "success"})
+    except Exception as e:
+        return JsonResponse({"status": "error", "message": str(e)})
+
+
+@login_required(login_url="login")
+def delete_customer(request, id=None):
+    customer = models.Customer.objects.get(id=id)
+    if customer.created_by == request.user:
+        customer.delete()
+        return redirect("/hub/")
+    return redirect("/hub/")
+
+
+def dynamic_js(request, partner=None):
+    file_path = "D:/DEV/chat_bot/chat_bot/chat_bot_app/templates/chat_bot_app/greatbot.js"  # in production ändern !
+    return FileResponse(open(file_path, "rb"), content_type="application/javascript")
+
+
+def dynamic_css(request, partner=None):
+    customer = models.Customer.objects.get(company_name=partner)
+    css = customer.css_code
     return HttpResponse(css, content_type="text/css")

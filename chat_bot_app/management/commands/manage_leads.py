@@ -8,6 +8,7 @@ from chat_bot_app import models, openAi, crawl_url
 from django.conf import settings
 from openai import OpenAI
 import os
+import calendar
 
 
 class Command(BaseCommand):
@@ -19,7 +20,6 @@ class Command(BaseCommand):
             password = "jezm nesb fhpj tvrv"
             username = "laxoutapp@gmail.com"
             subject = "Lead durch Chatbot"
-
             try:
                 server = smtplib.SMTP("smtp.gmail.com", port)
                 server.starttls()
@@ -227,112 +227,216 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.ERROR(f"An error occurred: {e}"))
 
         send_emails()
-        customers = models.Customer.objects.all()
 
-        for customer in customers:
-            chat_assistant = models.ChatAssistant.objects.get(
-                created_for=models.Customer.objects.get(
-                    company_name=customer.company_name
+        def send_stats_emails():
+            today = timezone.now().date()
+
+            last_day_of_month = calendar.monthrange(today.year, today.month)[1]
+
+            if today.day ==today.day: # last_day_of_month:
+                port = 587
+                password = "jezm nesb fhpj tvrv"
+                username = "laxoutapp@gmail.com"
+                subject = "Monatliche Zusammenfassung"
+                try:
+                    server = smtplib.SMTP("smtp.gmail.com", port)
+                    server.starttls()
+                    server.login(username, password)
+
+                    all_customers = models.Customer.objects.all()
+                    for customer in all_customers:
+                        html_template = Template(
+                            """
+                            <style>
+                                .container {
+                                    display: flex;
+                                    width: 90%;
+                                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                                    border-radius: 10px;
+                                    overflow: hidden;
+                                    background-color: white;
+                                    padding: 20px;
+                                    margin-bottom: 20px;
+                                    font-family: sans-serif;
+                                }
+                                .form-container {
+                                    width: 100%;
+                                    margin: auto;
+                                    text-align: left;
+                                }
+                            </style>
+                            <div class="container">
+                                <div class="form-container">
+                                    <h2>Statistiken:</h2>
+                                    <label for="monthly_requests">Anfragen (Monat):</label>
+                                    <h3>${request_count}</h3>
+        
+                                    <label for="bot_users">Nutzer des Chatbots (Monat):</label>
+                                    <h3>${user_count}</h3>
+        
+                                    <label for="generated_leads">Generierte Leads (Monat):</label>
+                                    <h3>${leads_count}</h3>
+        
+                                    <label for="conversion_rate">Conversion Rate (Monat):</label>
+                                    <h3>${conversion_rate}%</h3>
+                                </div>
+                            </div>
+                            """
+                        )
+
+                        msg = MIMEMultipart()
+                        msg["From"] = username
+                        msg["To"] = customer.lead_email
+                        msg["Subject"] = subject
+
+                        current_year = timezone.now().year
+                        current_month = timezone.now().month
+
+                        request_count = models.Request.objects.filter(
+                            created_for=customer.id,
+                            created_at__year=current_year,
+                            created_at__month=current_month,
+                        ).count()
+                        user_count = models.ChatbotUser.objects.filter(
+                            created_for=customer.id,
+                            created_at__year=current_year,
+                            created_at__month=current_month,
+                        ).count()
+                        leads_count = models.Lead.objects.filter(
+                            created_for=customer.id,
+                            created_at__year=current_year,
+                            created_at__month=current_month,
+                        ).count()
+
+                        # Fehlerbehandlung, falls user_count 0 ist, um Division durch 0 zu vermeiden
+                        if user_count > 0:
+                            conversion_rate = (leads_count / user_count) * 100
+                        else:
+                            conversion_rate = 0
+
+                        html_content = html_template.substitute(
+                            request_count=request_count,
+                            user_count=user_count,
+                            leads_count=leads_count,
+                            conversion_rate=conversion_rate,
+                        )
+
+                        msg.attach(MIMEText(html_content, "html"))
+
+                        server.sendmail(username, customer.lead_email, msg.as_string())
+
+                    server.quit()
+                except Exception as e:
+                    self.stdout.write(self.style.ERROR(f"An error occurred: {e}"))
+            else:
+                self.stdout.write(
+                    self.style.WARNING("Heute ist nicht der letzte Tag des Monats.")
                 )
-            )
-            # Crawl the website
-            crawl_url.crawl_website(customer.website_url, customer.company_name)
+        send_stats_emails()
 
-            # Update vector store logic
-            company_name = customer.company_name
-            vector_store_id = self.update_vector_store(company_name,chat_assistant)
+            #         chat_assistant = models.ChatAssistant.objects.get(
 
-            # Update the assistant
-            assistant_id = self.update_assistant(chat_assistant, vector_store_id)
+    #             created_for=models.Customer.objects.get(
+    #                 company_name=customer.company_name
+    #             )
+    #         )
+    #         # Crawl the website
+    #         crawl_url.crawl_website(customer.website_url, customer.company_name)
 
-            # Update the chat assistant model
-            chat_assistant.vector_store_id = vector_store_id
-            chat_assistant.assistant_id = assistant_id
-            chat_assistant.partner_name = customer.company_name
-            chat_assistant.save()
+    #         # Update vector store logic
+    #         company_name = customer.company_name
+    #         vector_store_id = self.update_vector_store(company_name,chat_assistant)
 
-            print(f"Assistant for {company_name} updated successfully.")
+    #         # Update the assistant
+    #         assistant_id = self.update_assistant(chat_assistant, vector_store_id)
 
-    def update_vector_store(self, company_name, chat_assistant):
-            client = OpenAI(api_key=settings.OPENAI_API_KEY)
+    #         # Update the chat assistant model
+    #         chat_assistant.vector_store_id = vector_store_id
+    #         chat_assistant.assistant_id = assistant_id
+    #         chat_assistant.partner_name = customer.company_name
+    #         chat_assistant.save()
 
-            # Check if vector store exists and delete it
+    #         print(f"Assistant for {company_name} updated successfully.")
 
-            client.beta.vector_stores.delete(
-                vector_store_id=chat_assistant.vector_store_id
-            )
+    # def update_vector_store(self, company_name, chat_assistant):
+    #         client = OpenAI(api_key=settings.OPENAI_API_KEY)
 
-            # Create new vector store
-            vector_store = client.beta.vector_stores.create(name=company_name)
-            print(f"Vector store for {company_name} created with ID: {vector_store.id}")
+    #         # Check if vector store exists and delete it
 
-            file_paths = [f"{company_name}.txt", "chat_bot_creator_laxout.txt"]
-            uploaded_files_dir = os.path.join("uploaded_files", company_name)
-            if os.path.exists(uploaded_files_dir):
-                file_paths += [
-                    os.path.join(uploaded_files_dir, file)
-                    for file in os.listdir(uploaded_files_dir)
-                ]
+    #         client.beta.vector_stores.delete(
+    #             vector_store_id=chat_assistant.vector_store_id
+    #         )
 
-            supported_formats = [
-                "c",
-                "cpp",
-                "css",
-                "csv",
-                "docx",
-                "gif",
-                "html",
-                "java",
-                "jpeg",
-                "jpg",
-                "js",
-                "json",
-                "md",
-                "pdf",
-                "php",
-                "png",
-                "pptx",
-                "py",
-                "rb",
-                "tar",
-                "tex",
-                "ts",
-                "txt",
-                "webp",
-                "xlsx",
-                "xml",
-                "zip",
-            ]
+    #         # Create new vector store
+    #         vector_store = client.beta.vector_stores.create(name=company_name)
+    #         print(f"Vector store for {company_name} created with ID: {vector_store.id}")
 
-            file_streams = []
-            for path in file_paths:
-                if os.path.getsize(path) == 0:
-                    print(f"The file {path} is empty or not valid.")
-                    continue
-                with open(path, "rb") as file:
-                    content = file.read()
-                    if not content:
-                        raise ValueError(f"The file {path} is empty or not valid.")
-                    file_ext = path.split(".")[-1]
-                    if file_ext not in supported_formats:
-                        raise ValueError(f"The file {path} has an unsupported format.")
-                    file_streams.append(open(path, "rb"))
+    #         file_paths = [f"{company_name}.txt", "chat_bot_creator_laxout.txt"]
+    #         uploaded_files_dir = os.path.join("uploaded_files", company_name)
+    #         if os.path.exists(uploaded_files_dir):
+    #             file_paths += [
+    #                 os.path.join(uploaded_files_dir, file)
+    #                 for file in os.listdir(uploaded_files_dir)
+    #             ]
 
-            if not file_streams:
-                raise ValueError("No valid files to process.")
+    #         supported_formats = [
+    #             "c",
+    #             "cpp",
+    #             "css",
+    #             "csv",
+    #             "docx",
+    #             "gif",
+    #             "html",
+    #             "java",
+    #             "jpeg",
+    #             "jpg",
+    #             "js",
+    #             "json",
+    #             "md",
+    #             "pdf",
+    #             "php",
+    #             "png",
+    #             "pptx",
+    #             "py",
+    #             "rb",
+    #             "tar",
+    #             "tex",
+    #             "ts",
+    #             "txt",
+    #             "webp",
+    #             "xlsx",
+    #             "xml",
+    #             "zip",
+    #         ]
 
-            file_batch = client.beta.vector_stores.file_batches.upload_and_poll(
-                vector_store_id=vector_store.id, files=file_streams
-            )
+    #         file_streams = []
+    #         for path in file_paths:
+    #             if os.path.getsize(path) == 0:
+    #                 print(f"The file {path} is empty or not valid.")
+    #                 continue
+    #             with open(path, "rb") as file:
+    #                 content = file.read()
+    #                 if not content:
+    #                     raise ValueError(f"The file {path} is empty or not valid.")
+    #                 file_ext = path.split(".")[-1]
+    #                 if file_ext not in supported_formats:
+    #                     raise ValueError(f"The file {path} has an unsupported format.")
+    #                 file_streams.append(open(path, "rb"))
 
-            return vector_store.id
+    #         if not file_streams:
+    #             raise ValueError("No valid files to process.")
 
-    def update_assistant(self, chat_assistant, vector_store_id):
-            client = OpenAI(api_key=settings.OPENAI_API_KEY)
+    #         file_batch = client.beta.vector_stores.file_batches.upload_and_poll(
+    #             vector_store_id=vector_store.id, files=file_streams
+    #         )
 
-            assistant = client.beta.assistants.update(
-                assistant_id=chat_assistant.assistant_id,
-                tool_resources={"file_search": {"vector_store_ids": [vector_store_id]}},
-            )
-            return assistant.id
+    #         return vector_store.id
 
+    # def update_assistant(self, chat_assistant, vector_store_id):
+    #         client = OpenAI(api_key=settings.OPENAI_API_KEY)
+
+    #         assistant = client.beta.assistants.update(
+    #             assistant_id=chat_assistant.assistant_id,
+    #             tool_resources={"file_search": {"vector_store_ids": [vector_store_id]}},
+    #         )
+    #         return assistant.id

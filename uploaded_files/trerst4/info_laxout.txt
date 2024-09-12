@@ -1,4 +1,0 @@
-Die Laxout-App ist der ultimative Begleiter für Ihre Patienten/Kunden. Stellen Sie Ihren Patienten individuelle Workouts ein. Ihre Patienten können die Übungen per Videoanleitung bequem von zuhause machen
-Die Software bietet Ihnen die Möglichkeit, die Bindung zu Ihrer Patienten zu stärken und sich nebenbei etwas dazuzuverdienen. Und das alles ist für Sie kostenlos!
-Die Software ist aufgebaut wie eine ganz normale Workout-App mit einem Dashboard zum Erstellen der Übungen. Die Übungen werden in kurzen Videosequenzen vorgemacht und man hat einen Timer bzw. die Anzahl der auszuführenden Wiederholungen als Vorgabe. Sie können sich auch anzeigen lassen, was es bei jeder Übung zu beachten gibt.
-Bastian Friedrich ist Gründer von Laxout 

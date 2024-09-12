@@ -17,7 +17,7 @@ function sendPersonalData() {
     formedData.append("email", email);
     formedData.append("uid", uid);
 
-    fetch("./saveuserdata/", {
+    fetch("greatbot.eu.pythonanywhere.com/saveuserdata/", {
       method: "POST",
       headers: {
         'X-CSRFToken': token,
@@ -80,7 +80,7 @@ function sendMessage() {
     formedData.append("chatbotResponses", chatbotResponses);
     formedData.append("uid", uid);
 
-    fetch("./sendmessage/", {
+    fetch("greatbot.eu.pythonanywhere.com/sendmessage/", {
       method: "POST",
       headers: {
         'X-CSRFToken': token,

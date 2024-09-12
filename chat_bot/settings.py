@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 
 from pathlib import Path
+import os
+
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -22,11 +24,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: don't run with debug turned on in production!
-OPENAI_API_KEY = "sk-1PNWKk7nQmVlKUWQwB0OOHASbKxAxpyrrg10guxhfBT3BlbkFJ7I6eYjm80xSG1waivGEsAxlsY1KkS02PxGqXE97J4A"
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 # Laden des Django Secret Keys
-SECRET_KEY = "a<s45fasf68af7/2090!32445##21324!/&assfasmnxcjhjhapüfsdaf"
-AZURE_API_KEY = "f45006b2ec9f49d8937bb220c91816b8"
-AZURE_END_POINT = "https://laxoutfinetuning.openai.azure.com/"
+SECRET_KEY = os.getenv('SECRET_KEY')
+AZURE_API_KEY = os.getenv('AZURE_API_KEY')
+AZURE_END_POINT = os.getenv('AZURE_END_POINT')
 DEBUG = True
 
 ALLOWED_HOSTS = ["*"]

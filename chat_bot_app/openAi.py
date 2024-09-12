@@ -179,7 +179,7 @@ def create_assistant(company_name, customer_object):
     <!-- <meta name="send-message-url-greatbot-ai" content="sendmessage">
     <meta name="save-user-data-url-greatbot-ai" content="saveuserdata"> -->
 
-    <link rel="stylesheet" type="text/css" href="{customer_object.css_url}">
+    <link rel="stylesheet" type="text/css" href="greatbot.eu.pythonanywhere.com/{customer_object.css_url}">
     <div id="chatbot">
         <div id="chatbot-button" onclick="toggleChat()">💬</div>
         <div id="chatbot-window">
@@ -202,7 +202,7 @@ def create_assistant(company_name, customer_object):
             </div>
         </div>
     </div>
-    <script type="text/javascript" src="{customer_object.js_url}"></script>
+    <script type="text/javascript" src="greatbot.eu.pythonanywhere.com/{customer_object.js_url}"></script>
 </div>"""
     print(code)
     customer_object.code = code
@@ -428,7 +428,7 @@ def chatApplication(request, partner=None):
 
 
 def generate_interest_email(question_string, name, language):
-    response = client.chat.completions.create(
+    response = client_azure.chat.completions.create(
         model="gpt-4o",
         messages=[
             {

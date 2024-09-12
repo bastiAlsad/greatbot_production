@@ -8,6 +8,9 @@
     integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/codemirror.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/mode/css/css.min.js"></script>
 
 <!DOCTYPE html>
 <html lang="de">
@@ -124,9 +127,11 @@
                     </div>
                 </div>
             </div>
-            <label for="company-name">Html-Code:</label>
+            <label for="css-name">Css-Code:</label>
             <div style="display: flex; flex-direction: row; justify-content: space-between;">
-                <textarea style="width: 100%; height: 400px; border: solid 1px #DDD; border-radius: 10px;" type="url" id="css_url" name="css_url">{{customer.code}} </textarea>
+                <div style="display: flex; flex-direction: row; justify-content: space-between; width: 100%;">
+                    <textarea id="css_code" name="css_code" style="width: 100%;">{{customer.css_code}}</textarea>
+                </div>
                 <div style="margin-left: 20px; margin-top: 5px; position: relative;">
                     <svg id="copy-btn1" xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
                         class="bi bi-copy" viewBox="0 0 16 16" style="cursor: pointer;">
@@ -139,12 +144,12 @@
                     </div>
                 </div>
             </div>
-            <div style="height: 20px;">
+            <div style="height: 40px;">
 
             </div>
-            <!-- <label for="company-name">JS Url:</label>
+            <label for="company-name">Html-Code zum Einbetten:</label>
             <div style="display: flex; flex-direction: row; justify-content: space-between;">
-                <input type="url" id="js_url" name="js_url" readonly value="{{customer.js_url}}">
+                <textarea style="width: 100%;" id="html_code" name="html_code">{{customer.code}} </textarea>
                 <div style="margin-left: 20px; margin-top: 5px; position: relative;">
                     <svg id="copy-btn2" xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
                         class="bi bi-copy" viewBox="0 0 16 16" style="cursor: pointer;">
@@ -157,36 +162,8 @@
                     </div>
                 </div>
             </div>
-            <label for="company-name">Send Message Url:</label>
-            <div style="display: flex; flex-direction: row; justify-content: space-between;">
-                <input type="url" id="send_message_url" name="send_message_url" readonly value="{{customer.send_message_url}}">
-                <div style="margin-left: 20px; margin-top: 5px; position: relative;">
-                    <svg id="copy-btn3" xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
-                        class="bi bi-copy" viewBox="0 0 16 16" style="cursor: pointer;">
-                        <path fill-rule="evenodd"
-                            d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1z" />
-                    </svg>
-                    <div id="copy-confirmation3"
-                        style="display: none; position: absolute; top: -30px; left: 50%; transform: translateX(-50%); background-color: #6c63ff; color: white; padding: 5px 10px; border-radius: 5px; font-size: 14px;">
-                        Kopiert!
-                    </div>
-                </div>
+            <div style="height: 20px;">
             </div>
-            <label for="company-name">Save User Data Url:</label>
-            <div style="display: flex; flex-direction: row; justify-content: space-between;">
-                <input type="url" id="save_user_data_url" name="save_user_data_url" readonly value="{{customer.save_user_data_url}}">
-                <div style="margin-left: 20px; margin-top: 5px; position: relative;">
-                    <svg id="copy-btn4" xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
-                        class="bi bi-copy" viewBox="0 0 16 16" style="cursor: pointer;">
-                        <path fill-rule="evenodd"
-                            d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1z" />
-                    </svg>
-                    <div id="copy-confirmation4"
-                        style="display: none; position: absolute; top: -30px; left: 50%; transform: translateX(-50%); background-color: #6c63ff; color: white; padding: 5px 10px; border-radius: 5px; font-size: 14px;">
-                        Kopiert!
-                    </div>
-                </div>
-            </div> -->
             <label for="subscription_model">Subscription Model</label>
             <select id="subscription_model" name="subscription_model"
                 style="height: 50px; width: 100%; border-radius: 5px;">
@@ -223,7 +200,7 @@
             <label for="color_code">Farbe für Chat auswählen</label>
             <input type="color" id="color_code" name="color_code" value="{{customer.color_code}}">
             <label for="color-picker">Akzent-Farbe für Chat auswählen</label>
-                <input type="color" id="accent_color" name="accent_color" value="{{customer.accent_color}}">
+            <input type="color" id="accent_color" name="accent_color" value="{{customer.accent_color}}">
         </div>
     </div>
 
@@ -283,40 +260,57 @@
         const leadData = JSON.parse('{{ lead_data|safe|escapejs }}');
         const topQuestionsData = JSON.parse('{{ top_questions_data|safe|escapejs }}');
 
-    const topQuestionsChartCtx = document.getElementById('topQuestionsChart').getContext('2d');
-    new Chart(topQuestionsChartCtx, {
-        type: 'bar',
-        data: {
-            labels: topQuestionsData.map(entry => entry.themenbereich),
-            datasets: [{
-                label: 'Fragenanzahl',
-                data: topQuestionsData.map(entry => entry.amount),
-                backgroundColor: 'rgb(108, 99, 255)',
-                borderColor: 'rgb(108, 99, 255)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Fragen'
-                    }
-                },
-                y: {
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: 'Anzahl'
+        const topQuestionsChartCtx = document.getElementById('topQuestionsChart').getContext('2d');
+        new Chart(topQuestionsChartCtx, {
+            type: 'bar',
+            data: {
+                labels: topQuestionsData.map(entry => entry.themenbereich),
+                datasets: [{
+                    label: 'Fragenanzahl',
+                    data: topQuestionsData.map(entry => entry.amount),
+                    backgroundColor: 'rgb(108, 99, 255)',
+                    borderColor: 'rgb(108, 99, 255)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Fragen'
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Anzahl'
+                        }
                     }
                 }
             }
-        }
-    });
+        });
 
-
+        var editor_css = CodeMirror.fromTextArea(document.getElementById("css_code"), {
+            lineNumbers: true,
+            mode: "css",
+            theme: "default",
+            matchBrackets: true,
+            indentUnit: 2,
+            autoCloseBrackets: true,
+        });
+        var editor_html = CodeMirror.fromTextArea(document.getElementById("html_code"), {
+            lineNumbers: true,
+            mode: "html",
+            theme: "default",
+            matchBrackets: true,
+            indentUnit: 2,
+            autoCloseBrackets: true,
+        });
+        editor_css.setSize("100%", "400px");
+        editor_html.setSize("100%", "400px");
 
         function createChart(ctx, label, data, unit = 'day') {
             return new Chart(ctx, {
@@ -366,7 +360,6 @@
 
         document.getElementById('time-period').addEventListener('change', function () {
             const period = this.value;
-
             updateChart(requestsChart, requestData[period], period);
             updateChart(usersChart, userData[period], period);
             updateChart(leadsChart, leadData[period], period);
@@ -384,8 +377,8 @@
 
             chart.update();
         }
-        
-        
+
+
 
         document.getElementById('copy-btn').addEventListener('click', function () {
             const urlField = document.getElementById('chatbot_url');
@@ -401,7 +394,7 @@
         });
 
         document.getElementById('copy-btn1').addEventListener('click', function () {
-            const urlField = document.getElementById('css_url');
+            const urlField = document.getElementById('css_code');
             urlField.select();
             urlField.setSelectionRange(0, 99999); // For mobile devices
             navigator.clipboard.writeText(urlField.value);
@@ -414,7 +407,7 @@
         });
 
         document.getElementById('copy-btn2').addEventListener('click', function () {
-            const urlField = document.getElementById('js_url');
+            const urlField = document.getElementById('html_code');
             urlField.select();
             urlField.setSelectionRange(0, 99999); // For mobile devices
             navigator.clipboard.writeText(urlField.value);
@@ -426,31 +419,6 @@
             }, 2000);
         });
 
-        document.getElementById('copy-btn3').addEventListener('click', function () {
-            const urlField = document.getElementById('send_message_url');
-            urlField.select();
-            urlField.setSelectionRange(0, 99999); // For mobile devices
-            navigator.clipboard.writeText(urlField.value);
-
-            const confirmation = document.getElementById('copy-confirmation3');
-            confirmation.style.display = 'block';
-            setTimeout(() => {
-                confirmation.style.display = 'none';
-            }, 2000);
-        });
-
-        document.getElementById('copy-btn4').addEventListener('click', function () {
-            const urlField = document.getElementById('save_user_data_url');
-            urlField.select();
-            urlField.setSelectionRange(0, 99999); // For mobile devices
-            navigator.clipboard.writeText(urlField.value);
-
-            const confirmation = document.getElementById('copy-confirmation4');
-            confirmation.style.display = 'block';
-            setTimeout(() => {
-                confirmation.style.display = 'none';
-            }, 2000);
-        });
 
         function previewLogo() {
             const logoUrl = document.getElementById('logo_url').value;
@@ -491,6 +459,15 @@
             element.addEventListener('change', (event) => {
                 sendUpdate(event.target.name, event.target.value);
             });
+        });
+        editor_css.on('change', function () {
+            sendUpdate('css_code', editor_css.getValue());
+        });
+
+        // Überwache Änderungen im HTML CodeMirror und sende die Änderungen
+        editor_html.on('change', function () {
+
+            sendUpdate('code', editor_html.getValue()); // 'code' bezieht sich auf das HTML-Feld in der Datenbank
         });
 
         // Initialize subscription model
