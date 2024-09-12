@@ -69,4 +69,3 @@ env.bak/
 venv.bak/
 #Migrations
 chat_bot_app/migrations/*.py
-settings.py
