@@ -93,27 +93,26 @@ TEMPLATES = [
 WSGI_APPLICATION = 'chat_bot.wsgi.application'
 
 #dashboardlaxout
-
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'dashboardlaxout$database2',
-#         'USER': 'dashboardlaxout',
-#         'PASSWORD': '?IScbaTr9a!%',
-#         'HOST': 'dashboardlaxout.mysql.eu.pythonanywhere-services.com',
-#         'PORT': '',
-#     }
-# }
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'greatbot$database',
+        'USER': 'greatbot',
+        'PASSWORD': 'gB!%99HtmZ??',
+        'HOST': 'greatbot.mysql.eu.pythonanywhere-services.com',
+        'PORT': '',
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
