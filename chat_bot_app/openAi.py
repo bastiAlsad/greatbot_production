@@ -203,8 +203,8 @@ def create_assistant(company_name, customer_object):
         </div>
     </div>
     <script type="text/javascript" src="greatbot.eu.pythonanywhere.com/{customer_object.js_url}"></script>
+
 </div>"""
-    print(code)
     customer_object.code = code
     customer_object.save()
 
