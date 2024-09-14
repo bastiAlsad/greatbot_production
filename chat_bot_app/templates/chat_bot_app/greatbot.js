@@ -81,7 +81,7 @@ function sendMessage() {
     formedData.append("chatbotResponses", chatbotResponses);
     formedData.append("uid", uid);
 
-    fetch("https://greatbot.eu.pythonanywhere.com/api/"+company_name+"/assistant-chat/saveuserdata/", {
+    fetch("https://greatbot.eu.pythonanywhere.com/api/"+company_name+"/assistant-chat/sendmessage/", {
       method: "POST",
       headers: {
         'X-CSRFToken': token,
