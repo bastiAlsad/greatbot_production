@@ -24,11 +24,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: don't run with debug turned on in production!
-OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
-# Laden des Django Secret Keys
-SECRET_KEY = os.getenv('SECRET_KEY')
-AZURE_API_KEY = os.getenv('AZURE_API_KEY')
-AZURE_END_POINT = os.getenv('AZURE_END_POINT')
+SECRET_KEY="a<s45fasf68af7/209032445##21324/&assfasmnxcjhjhapüfsdaf"
+AZURE_API_KEY="f45006b2ec9f49d8937bb220c91816b8"
+AZURE_END_POINT="https://laxoutfinetuning.openai.azure.com/"
 DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
@@ -96,23 +94,23 @@ WSGI_APPLICATION = 'chat_bot.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'greatbot$database',
-#         'USER': 'greatbot',
-#         'PASSWORD': 'gB!%99HtmZ??',
-#         'HOST': 'greatbot.mysql.eu.pythonanywhere-services.com',
-#         'PORT': '',
-#     }
-# }
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'greatbot$database2',
+        'USER': 'greatbot',
+        'PASSWORD': 'gB!%99HtmZ??',
+        'HOST': 'greatbot.mysql.eu.pythonanywhere-services.com',
+        'PORT': '',
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators

@@ -39,8 +39,8 @@ class Customer(models.Model):
     save_user_data_url = models.CharField(default="", max_length=300)
     send_message_url = models.CharField(default="", max_length=300)
     training_file_path = models.CharField(default="", max_length=300)
-    code = models.CharField(default="", max_length=8000)
-    css_code = models.CharField(default="", max_length=16000)
+    code = models.TextField(default="", max_length=8000)
+    css_code = models.TextField(default="", max_length=16000)
 
 class SummariserAssistant(models.Model):
     assistant_id = models.CharField(default = "", max_length=300)
