@@ -207,6 +207,8 @@ def create_assistant(company_name, customer_object):
 </div>"""
     customer_object.code = code
     customer_object.save()
+    print(customer_object.code)
+    
 
     chat_assistant = models.ChatAssistant.objects.create(created_for=customer_object)
     chat_assistant.vector_store_id = vector_store.id
