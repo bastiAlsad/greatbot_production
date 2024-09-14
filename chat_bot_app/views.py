@@ -90,7 +90,7 @@ def create_customer(request):
     <meta name="csrf-token-greatbot-ai" content="{{ csrf_token }}">
     <meta name="save-user-data-url-greatbot-ai" content="saveuserdata"> -->
 
-    <link rel="stylesheet" type="text/css" href="greatbot.eu.pythonanywhere.com/{css_url}">
+    <link rel="stylesheet" type="text/css" href="greatbot.eu.pythonanywhere.com{css_url}">
     <div id="chatbot">
         <div id="chatbot-button" onclick="toggleChat()">💬</div>
         <div id="chatbot-window">
@@ -113,7 +113,7 @@ def create_customer(request):
             </div>
         </div>
     </div>
-    <script type="text/javascript" src="greatbot.eu.pythonanywhere.com/{js_url}"></script>
+    <script type="text/javascript" src="greatbot.eu.pythonanywhere.com{js_url}"></script>
 
 </div>""",
             css_code=f"""

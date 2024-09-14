@@ -26,7 +26,7 @@ AZURE_END_POINT = env("AZURE_END_POINT")
 
 PRODUCTION = env.bool("PRODUCTION", default=True)
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["https://greatbot.eu.pythonanywhere.com"]
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
@@ -63,7 +63,7 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    "https://greatbot.eu.pythonanywhere.com",
+    "*",
 ]
 
 
