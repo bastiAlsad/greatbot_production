@@ -26,7 +26,7 @@ AZURE_END_POINT = env("AZURE_END_POINT")
 
 PRODUCTION = env.bool("PRODUCTION", default=True)
 
-ALLOWED_HOSTS = ["https://greatbot.eu.pythonanywhere.com"]
+ALLOWED_HOSTS = ["*"]
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
@@ -103,7 +103,7 @@ if PRODUCTION:
             "PORT": "",
         }
     }
-    DEBUG = False
+    DEBUG = True
 else:
     print("Local database active")
     DATABASES = {
