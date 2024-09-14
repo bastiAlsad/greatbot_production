@@ -10,7 +10,7 @@ from typing_extensions import override
 from uuid import uuid4
 import os
 import time
-
+from django.views.decorators.csrf import csrf_exempt
 # client = OpenAI(api_key=settings.OPENAI_API_KEY)
 
 client_azure = AzureOpenAI(
@@ -180,7 +180,7 @@ def create_assistant(company_name, customer_object):
 
     return HttpResponse("OK")
 
-
+@csrf_exempt
 def save_user_data(request, partner=None):
     customer = models.Customer.objects.get(company_name=partner)
 
@@ -286,7 +286,7 @@ def format_message(message):
     message = re.sub(r"\s+", " ", message).strip()
     return message
 
-
+@csrf_exempt
 def chatApplication(request, partner=None):
     customer = models.Customer.objects.get(company_name=partner)
 
