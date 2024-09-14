@@ -2,6 +2,7 @@ var id_count = 0;
 var uid = "";
 var chatbotResponses = 0;
 var token = document.querySelector('meta[name="csrf-token-greatbot-ai"]').getAttribute('content');
+var company_name = document.querySelector('meta[name="company-name-greatbot-ai"]').getAttribute('content');
 // var save_user_data_url = document.querySelector('meta[name="save-user-data-url-greatbot-ai"]').getAttribute('content');
 // var send_message_url = document.querySelector('meta[name="send-message-url-greatbot-ai"]').getAttribute('content');
 
@@ -17,7 +18,7 @@ function sendPersonalData() {
     formedData.append("email", email);
     formedData.append("uid", uid);
 
-    fetch("./saveuserdata/", {
+    fetch("https://greatbot.eu.pythonanywhere.com/api/"+company_name+"/assistant-chat/saveuserdata/", {
       method: "POST",
       headers: {
         'X-CSRFToken': token,
@@ -80,7 +81,7 @@ function sendMessage() {
     formedData.append("chatbotResponses", chatbotResponses);
     formedData.append("uid", uid);
 
-    fetch("./sendmessage/", {
+    fetch("https://greatbot.eu.pythonanywhere.com/api/"+company_name+"/assistant-chat/saveuserdata/", {
       method: "POST",
       headers: {
         'X-CSRFToken': token,

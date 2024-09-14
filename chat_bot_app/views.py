@@ -88,7 +88,7 @@ def create_customer(request):
             created_by=request.user,
             code=f"""<div id="chatbot-container">
     <meta name="csrf-token-greatbot-ai" content="{{ csrf_token }}">
-    <meta name="save-user-data-url-greatbot-ai" content="saveuserdata"> -->
+    <meta name="company-name-greatbot-ai" content="{company_name}">
 
     <link rel="stylesheet" type="text/css" href="greatbot.eu.pythonanywhere.com{css_url}">
     <div id="chatbot">
