@@ -20,6 +20,7 @@ client_azure = AzureOpenAI(
 )
 client = client_azure
 
+
 def prepare_company_file(company_name):
     assistant_model, created = models.SummariserAssistant.objects.get_or_create(id=1)
 
@@ -172,11 +173,8 @@ def create_assistant(company_name, customer_object):
     customer_object.js_url = f"/api/{company_name}/dynamic-js/"
     customer_object.save_user_data_url = f"/api/{company_name}/saveuserdata/"
     customer_object.send_message_url = f"/api/{company_name}/sendmessage/"
-    customer_object.save()
     code = f"""<div id="chatbot-container">
     <meta name="csrf-token-greatbot-ai" content="{{ csrf_token }}">
-    <!-- partner namen eintragen in -->
-    <!-- <meta name="send-message-url-greatbot-ai" content="sendmessage">
     <meta name="save-user-data-url-greatbot-ai" content="saveuserdata"> -->
 
     <link rel="stylesheet" type="text/css" href="greatbot.eu.pythonanywhere.com/{customer_object.css_url}">
@@ -207,8 +205,13 @@ def create_assistant(company_name, customer_object):
 </div>"""
     customer_object.code = code
     customer_object.save()
+    print(code)
+    print("######")
+    print("######")
+    print("######")
+    print("######")
+    print("######")
     print(customer_object.code)
-    
 
     chat_assistant = models.ChatAssistant.objects.create(created_for=customer_object)
     chat_assistant.vector_store_id = vector_store.id

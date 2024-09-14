@@ -11,6 +11,9 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/codemirror.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/mode/css/css.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/xml/xml.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/edit/matchbrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/edit/closebrackets.min.js"></script>
 
 <!DOCTYPE html>
 <html lang="de">
@@ -193,14 +196,14 @@
                 </div>
             </div>
 
-            <label for="website_url">Website URL des Unternehmens</label>
+            <!-- <label for="website_url">Website URL des Unternehmens</label>
             <input type="url" id="website_url" name="website_url" placeholder="https://" required
-                value="{{customer.website_url}}">
+                value="{{customer.website_url}}"> -->
 
-            <label for="color_code">Farbe für Chat auswählen</label>
+            <!-- <label for="color_code">Farbe für Chat auswählen</label>
             <input type="color" id="color_code" name="color_code" value="{{customer.color_code}}">
             <label for="color-picker">Akzent-Farbe für Chat auswählen</label>
-            <input type="color" id="accent_color" name="accent_color" value="{{customer.accent_color}}">
+            <input type="color" id="accent_color" name="accent_color" value="{{customer.accent_color}}"> -->
         </div>
     </div>
 
@@ -303,7 +306,7 @@
         });
         var editor_html = CodeMirror.fromTextArea(document.getElementById("html_code"), {
             lineNumbers: true,
-            mode: "html",
+            mode: "text/html",  // Ensure the correct mode for HTML
             theme: "default",
             matchBrackets: true,
             indentUnit: 2,

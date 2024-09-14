@@ -62,8 +62,8 @@ def create_customer(request):
     if request.method == "POST":
         company_name = request.POST.get("company_name").lower()
         lead_email = request.POST.get("lead_email")
-        color_code = request.POST.get("color_code")
-        accent_color = request.POST.get("accent_color")
+        #color_code = request.POST.get("color_code")
+        #accent_color = request.POST.get("accent_color")
         logo_url = request.POST.get("logo_url")
         subscription_model = request.POST.get("subscription_model")
         # website_url = request.POST.get("website_url")
@@ -79,9 +79,9 @@ def create_customer(request):
             subscription_model=subscription_model,
             company_name=company_name,
             lead_email=lead_email,
-            color_code=color_code,
+            #color_code=color_code,
             logo_url=logo_url,
-            accent_color=accent_color,
+            #accent_color=accent_color,
             created_by=request.user,
             css_code=f"""
     :root {{
