@@ -169,49 +169,8 @@ def create_assistant(company_name, customer_object):
     print(f"Assistant ID: {assistant.id}")
 
     customer_object.chatbot_url = f"/api/{company_name}/assistant-chat/"
-    customer_object.css_url = f"/api/{company_name}/dynamic-css/"
-    customer_object.js_url = f"/api/{company_name}/dynamic-js/"
-    customer_object.save_user_data_url = f"/api/{company_name}/saveuserdata/"
-    customer_object.send_message_url = f"/api/{company_name}/sendmessage/"
-    code = f"""<div id="chatbot-container">
-    <meta name="csrf-token-greatbot-ai" content="{{ csrf_token }}">
-    <meta name="save-user-data-url-greatbot-ai" content="saveuserdata"> -->
-
-    <link rel="stylesheet" type="text/css" href="greatbot.eu.pythonanywhere.com/{customer_object.css_url}">
-    <div id="chatbot">
-        <div id="chatbot-button" onclick="toggleChat()">💬</div>
-        <div id="chatbot-window">
-            <div class="chat-header">
-                <button class="back-button" onclick="toggleChat()">X</button>
-                Chat Assistant
-            </div>
-            <div class="chat-messages" id="chatMessages">
-                <div class="message received">
-                    <div class="text">
-                        <h4>Hey! Herzlich willkommen 👋🏼</h4>
-                        Ich bin Greatbot und beantworte Ihnen gerne alle Fragen zu unseren Leistungen und unserem
-                        Unternehmen laxout - wie kann ich Ihnen helfen?
-                    </div>
-                </div>
-            </div>
-            <div class="chat-input">
-                <input type="text" id="messageInput" placeholder="Fragen Sie etwas...">
-                <button onclick="sendMessage()">Senden</button>
-            </div>
-        </div>
-    </div>
-    <script type="text/javascript" src="greatbot.eu.pythonanywhere.com/{customer_object.js_url}"></script>
-
-</div>"""
-    customer_object.code = code
+    
     customer_object.save()
-    print(code)
-    print("######")
-    print("######")
-    print("######")
-    print("######")
-    print("######")
-    print(customer_object.code)
 
     chat_assistant = models.ChatAssistant.objects.create(created_for=customer_object)
     chat_assistant.vector_store_id = vector_store.id

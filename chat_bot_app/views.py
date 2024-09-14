@@ -62,8 +62,8 @@ def create_customer(request):
     if request.method == "POST":
         company_name = request.POST.get("company_name").lower()
         lead_email = request.POST.get("lead_email")
-        #color_code = request.POST.get("color_code")
-        #accent_color = request.POST.get("accent_color")
+        # color_code = request.POST.get("color_code")
+        # accent_color = request.POST.get("accent_color")
         logo_url = request.POST.get("logo_url")
         subscription_model = request.POST.get("subscription_model")
         # website_url = request.POST.get("website_url")
@@ -75,14 +75,47 @@ def create_customer(request):
         if not validate_jsonl_file(uploaded_file):
             return HttpResponse("Die Datei muss mindestens 2 Zeilen Lang sein.")
 
+        css_url = f"/api/{company_name}/dynamic-css/"
+        js_url = f"/api/{company_name}/dynamic-js/"
+
         customer = models.Customer.objects.create(
             subscription_model=subscription_model,
             company_name=company_name,
             lead_email=lead_email,
-            #color_code=color_code,
+            # color_code=color_code,
             logo_url=logo_url,
-            #accent_color=accent_color,
+            # accent_color=accent_color,
             created_by=request.user,
+            code=f"""<div id="chatbot-container">
+    <meta name="csrf-token-greatbot-ai" content="{{ csrf_token }}">
+    <meta name="save-user-data-url-greatbot-ai" content="saveuserdata"> -->
+
+    <link rel="stylesheet" type="text/css" href="greatbot.eu.pythonanywhere.com/{css_url}">
+    <div id="chatbot">
+        <div id="chatbot-button" onclick="toggleChat()">💬</div>
+        <div id="chatbot-window">
+            <div class="chat-header">
+                <button class="back-button" onclick="toggleChat()">X</button>
+                Chat Assistant
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <div class="message received">
+                    <div class="text">
+                        <h4>Hey! Herzlich willkommen 👋🏼</h4>
+                        Ich bin Greatbot und beantworte Ihnen gerne alle Fragen zu unseren Leistungen und unserem
+                        Unternehmen laxout - wie kann ich Ihnen helfen?
+                    </div>
+                </div>
+            </div>
+            <div class="chat-input">
+                <input type="text" id="messageInput" placeholder="Fragen Sie etwas...">
+                <button onclick="sendMessage()">Senden</button>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="greatbot.eu.pythonanywhere.com/{js_url}"></script>
+
+</div>""",
             css_code=f"""
     :root {{
 /* Senden Button*/
@@ -283,6 +316,7 @@ def create_customer(request):
     """,
             # website_url=website_url,
         )
+        print(customer.code)
         # crawl_url.crawl_website(website_url, company_name)
 
         # Überprüfe, ob eine Datei hochgeladen wurde
