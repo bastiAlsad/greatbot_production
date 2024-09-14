@@ -91,7 +91,7 @@ def create_customer(request):
     <meta name="company-name-greatbot-ai" content="{company_name}">
     <link rel="stylesheet" type="text/css" href="greatbot.eu.pythonanywhere.com{css_url}">
     <div id="chatbot">
-        <div id="chatbot-button" onclick="toggleChat()">💬</div>
+        <div id="chatbot-button" onclick="toggleChat()">GB</div>
         <div id="chatbot-window">
             <div class="chat-header">
                 <button class="back-button" onclick="toggleChat()">X</button>
@@ -100,7 +100,7 @@ def create_customer(request):
             <div class="chat-messages" id="chatMessages">
                 <div class="message received">
                     <div class="text">
-                        <h4>Hey! Herzlich willkommen 👋🏼</h4>
+                        <h4>Hey, Herzlich willkommen!</h4>
                         Ich bin Greatbot und beantworte Ihnen gerne alle Fragen zu unseren Leistungen und unserem
                         Unternehmen laxout - wie kann ich Ihnen helfen?
                     </div>
