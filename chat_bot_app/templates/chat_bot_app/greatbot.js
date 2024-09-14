@@ -12,7 +12,6 @@ function sendPersonalData() {
 
   if (name.trim() !== "" && email.trim() !== "") {
     // Prepare and send the request
-    let token = document.querySelector('meta[name="csrf-token-chatbot"]').getAttribute('content');
     let formedData = new FormData();
     formedData.append("name", name);
     formedData.append("email", email);
