@@ -24,6 +24,6 @@ urlpatterns = [
     path("api/<str:partner>/assistant-chat/", openAi.chatApplication, name = "assistant_chat"),
     path("api/<str:partner>/assistant-chat/sendmessage/", openAi.chatApplication, name = "assistant_chat"),
     path('api/<str:partner>/assistant-chat/saveuserdata/', openAi.save_user_data, name='saveUserData'),
-    path('api/<str:partner>/assistant-chat/dynamic-css/', views.dynamic_css, name='dynamic_css'),
-    path('api/<str:partner>/assistant-chat/dynamic-js/', views.dynamic_js, name='dynamic_js'),
+    path('api/<str:partner>/dynamic-css/', views.dynamic_css, name='dynamic_css'),
+    path('api/<str:partner>/dynamic-js/', views.dynamic_js, name='dynamic_js'),
 ]

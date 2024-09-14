@@ -460,7 +460,7 @@ def delete_customer(request, id=None):
 
 
 def dynamic_js(request, partner=None):
-    file_path = "D:/DEV/chat_bot/chat_bot/chat_bot_app/templates/chat_bot_app/greatbot.js"  # in production ändern !
+    file_path = "/home/greatbot/greatbot_production/chat_bot_app/templates/chat_bot_app/greatbot.js"  # in production ändern !
     return FileResponse(open(file_path, "rb"), content_type="application/javascript")
 
 
