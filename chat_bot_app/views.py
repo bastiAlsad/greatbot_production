@@ -77,6 +77,7 @@ def create_customer(request):
 
         css_url = f"/api/{company_name}/dynamic-css/"
         js_url = f"/api/{company_name}/dynamic-js/"
+        token = "{{csrf_token}}"
 
         customer = models.Customer.objects.create(
             subscription_model=subscription_model,
@@ -87,9 +88,9 @@ def create_customer(request):
             # accent_color=accent_color,
             created_by=request.user,
             code=f"""<div id="chatbot-container">
-    <meta name="csrf-token-greatbot-ai" content="{{ csrf_token }}">
+    <meta name="csrf-token-greatbot-ai" content="{token}">
     <meta name="company-name-greatbot-ai" content="{company_name}">
-    <link rel="stylesheet" type="text/css" href="greatbot.eu.pythonanywhere.com{css_url}">
+    <link rel="stylesheet" type="text/css" href="https://greatbot.eu.pythonanywhere.com{css_url}">
     <div id="chatbot">
         <div id="chatbot-button" onclick="toggleChat()">GB</div>
         <div id="chatbot-window">
@@ -112,7 +113,7 @@ def create_customer(request):
             </div>
         </div>
     </div>
-    <script type="text/javascript" src="greatbot.eu.pythonanywhere.com{js_url}"></script>
+    <script type="text/javascript" src="https://greatbot.eu.pythonanywhere.com{js_url}"></script>
 </div>""",
             css_code=f"""
     :root {{
