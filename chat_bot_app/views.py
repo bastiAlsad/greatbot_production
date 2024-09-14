@@ -89,7 +89,6 @@ def create_customer(request):
             code=f"""<div id="chatbot-container">
     <meta name="csrf-token-greatbot-ai" content="{{ csrf_token }}">
     <meta name="company-name-greatbot-ai" content="{company_name}">
-
     <link rel="stylesheet" type="text/css" href="greatbot.eu.pythonanywhere.com{css_url}">
     <div id="chatbot">
         <div id="chatbot-button" onclick="toggleChat()">💬</div>
@@ -114,7 +113,6 @@ def create_customer(request):
         </div>
     </div>
     <script type="text/javascript" src="greatbot.eu.pythonanywhere.com{js_url}"></script>
-
 </div>""",
             css_code=f"""
     :root {{
