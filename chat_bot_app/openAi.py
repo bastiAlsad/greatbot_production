@@ -187,6 +187,7 @@ def create_assistant(company_name, customer_object):
 def generate_code():
     return ''.join([str(random.randint(0, 9)) for _ in range(14)])
 
+@csrf_exempt
 @api_view(["POST"])
 def get_api_registration_token(request, partner = None):
     customer = models.Customer.objects.get(company_name = partner)
@@ -203,7 +204,7 @@ def get_api_registration_token(request, partner = None):
     return JsonResponse({"api_registration_token":api_registration_token, "uid":uid})
 
 
-
+@csrf_exempt
 @api_view(["POST"])
 def save_user_data(request, partner=None):
     customer = models.Customer.objects.get(company_name=partner)
@@ -312,6 +313,7 @@ def format_message(message):
     message = re.sub(r"\s+", " ", message).strip()
     return message
 
+@csrf_exempt
 @api_view(["POST"])
 def chatApplication(request, partner=None):
     customer = models.Customer.objects.get(company_name=partner)
