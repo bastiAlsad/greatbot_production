@@ -1,10 +1,30 @@
 var id_count = 0;
 var uid = "";
+var api_registration_token = "";
 var chatbotResponses = 0;
-var token = document.querySelector('meta[name="csrf-token-greatbot-ai"]').getAttribute('content');
+// var token = document.querySelector('meta[name="csrf-token-greatbot-ai"]').getAttribute('content');
 var company_name = document.querySelector('meta[name="company-name-greatbot-ai"]').getAttribute('content');
 // var save_user_data_url = document.querySelector('meta[name="save-user-data-url-greatbot-ai"]').getAttribute('content');
 // var send_message_url = document.querySelector('meta[name="send-message-url-greatbot-ai"]').getAttribute('content');
+window.onload = function() {
+  fetch("https://greatbot.eu.pythonanywhere.com/api/"+company_name+"/assistant-chat/getapiregistrationtoken"), {
+    method: "POST",}
+      .then(response => {
+          if (!response.ok) {
+              throw new Error("API Request failed");
+          }
+          return response.json(); 
+      })
+      .then(data => {
+          uid = data.uid;
+          api_registration_token = data.api_registration_token;
+          console.log("UID:", uid);
+          console.log("API Registration Token:", api_registration_token);
+      })
+      .catch(error => {
+          console.error("Error fetching the API data:", error);
+      });
+};
 
 function sendPersonalData() {
   var name = document.getElementById("chatbot_user_name").value;
@@ -16,12 +36,10 @@ function sendPersonalData() {
     formedData.append("name", name);
     formedData.append("email", email);
     formedData.append("uid", uid);
+    formedData.append("api_registration_token", api_registration_token);
 
     fetch("https://greatbot.eu.pythonanywhere.com/api/"+company_name+"/assistant-chat/saveuserdata/", {
       method: "POST",
-      headers: {
-        'X-CSRFToken': token,
-      },
       body: formedData
     })
       .then(response => response.json())
@@ -79,12 +97,10 @@ function sendMessage() {
     formedData.append("message", message);
     formedData.append("chatbotResponses", chatbotResponses);
     formedData.append("uid", uid);
+    formedData.append("api_registration_token", api_registration_token);
 
     fetch("https://greatbot.eu.pythonanywhere.com/api/"+company_name+"/assistant-chat/sendmessage/", {
       method: "POST",
-      headers: {
-        'X-CSRFToken': token,
-      },
       body: formedData
     })
       .then(response => response.json())

@@ -11,8 +11,12 @@ from uuid import uuid4
 import os
 import time
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework.decorators import (
+    api_view,
+)
 # client = OpenAI(api_key=settings.OPENAI_API_KEY)
-
+from django.shortcuts import get_object_or_404
+import random
 client_azure = AzureOpenAI(
     api_key=settings.AZURE_API_KEY,
     azure_endpoint=settings.AZURE_END_POINT,
@@ -180,15 +184,37 @@ def create_assistant(company_name, customer_object):
 
     return HttpResponse("OK")
 
-@csrf_exempt
+def generate_code():
+    return ''.join([str(random.randint(0, 9)) for _ in range(14)])
+
+@api_view(["POST"])
+def get_api_registration_token(request, partner = None):
+    customer = models.Customer.objects.get(company_name = partner)
+    uid = str(uuid4())
+    while models.ChatbotUser.objects.filter(uid=uid).exists():
+        uid = str(uuid4())
+    chat = models.ChatbotUser.objects.create(uid=uid, created_for=customer.id)
+    api_registration_token = generate_code()
+    while models.RegistrationToken.objects.filter(api_registration_token=api_registration_token).exists():
+        api_registration_token = generate_code()
+    api_registration_token_object = models.RegistrationToken.objects.create(api_registration_token = api_registration_token, created_for = chat.id)
+    customer.api_registration_tokens.add(api_registration_token_object)
+    customer.save()
+    return JsonResponse({"api_registration_token":api_registration_token, "uid":uid})
+
+
+
+@api_view(["POST"])
 def save_user_data(request, partner=None):
     customer = models.Customer.objects.get(company_name=partner)
-
     if request.method == "POST":
+        api_registration_token = request.POST.get("api_registration_token")
+        if not api_registration_token or api_registration_token == "":
+            return JsonResponse({"error": "Permission Error"}, status=403)
+        get_object_or_404(models.RegistrationToken, api_registration_token=api_registration_token)
         uid = request.POST.get("uid")
         # Generiere eine neue UID, falls keine vorhanden ist
         if not uid or uid == "":
-
             return JsonResponse({"error": "Permission Error"}, status=403)
 
         chat = models.ChatbotUser.objects.get(uid=uid, created_for=customer.id)
@@ -286,21 +312,18 @@ def format_message(message):
     message = re.sub(r"\s+", " ", message).strip()
     return message
 
-@csrf_exempt
+@api_view(["POST"])
 def chatApplication(request, partner=None):
     customer = models.Customer.objects.get(company_name=partner)
-
     if request.method == "POST":
-        print("POST Bedingung")
+        api_registration_token = request.POST.get("api_registration_token")
+        if not api_registration_token or api_registration_token == "":
+            return JsonResponse({"error": "Permission Error"}, status=403)
+        get_object_or_404(models.RegistrationToken, api_registration_token=api_registration_token)
         uid = request.POST.get("uid")
         if uid is None or uid == "":
-            uid = str(uuid4())
-            while models.ChatbotUser.objects.filter(uid=uid).exists():
-                uid = str(uuid4())
-
-        print("HÄ")
+            return JsonResponse({"error": "Permission Error"}, status=403)
         chat = models.ChatbotUser.objects.create(uid=uid, created_for=customer.id)
-
         try:
             assistant_instance = models.ChatAssistant.objects.get(partner_name=partner)
             # finetune_instance = models.ChatFineTuneModel.objects.get(partner_name = partner)
@@ -376,8 +399,7 @@ def chatApplication(request, partner=None):
 
             return JsonResponse(
                 {
-                    "answer_chat_assistant": format_message(message_content.value),
-                    "uid": uid,
+                    "answer_chat_assistant": format_message(message_content.value)
                 }
             )
 
@@ -409,8 +431,3 @@ def generate_interest_email(question_string, name, language):
 
     return response.choices[0].message.content
 
-
-def save_custom_embedding_code():
-
-    css_url = "test"
-    js_url = "test"

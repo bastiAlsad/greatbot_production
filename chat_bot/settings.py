@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "crispy_forms",
     "corsheaders",
+    'rest_framework',
+    'rest_framework.authtoken',
     "chat_bot_app",
 ]
 

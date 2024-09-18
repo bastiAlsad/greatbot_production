@@ -23,6 +23,10 @@ class ChatbotUser(models.Model):
     messages = models.ManyToManyField(ChatMessage)
     lead_processed = models.BooleanField(default=False)
 
+class RegistrationToken(models.Model):
+    api_registration_token = models.CharField(default="", max_length=200)
+    created_at = models.DateTimeField(default=timezone.now())
+    created_for = models.IntegerField(default=0)
 
 class Customer(models.Model):
     company_name = models.CharField(default="", max_length=300)
@@ -41,6 +45,7 @@ class Customer(models.Model):
     training_file_path = models.CharField(default="", max_length=300)
     code = models.TextField(default="")
     css_code = models.TextField(default="")
+    api_registration_tokens = models.ManyToManyField(RegistrationToken)
 
 class SummariserAssistant(models.Model):
     assistant_id = models.CharField(default = "", max_length=300)
