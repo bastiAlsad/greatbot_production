@@ -433,3 +433,5 @@ def generate_interest_email(question_string, name, language):
 
     return response.choices[0].message.content
 
+def save_custom_embedding_code():
+    pass
