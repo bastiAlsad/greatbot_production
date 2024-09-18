@@ -325,7 +325,7 @@ def chatApplication(request, partner=None):
         uid = request.POST.get("uid")
         if uid is None or uid == "":
             return JsonResponse({"error": "Permission Error"}, status=403)
-        chat = models.ChatbotUser.objects.create(uid=uid, created_for=customer.id)
+        chat = models.ChatbotUser.objects.get(uid=uid, created_for=customer.id)
         try:
             assistant_instance = models.ChatAssistant.objects.get(partner_name=partner)
             # finetune_instance = models.ChatFineTuneModel.objects.get(partner_name = partner)
