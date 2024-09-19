@@ -11,6 +11,8 @@ urlpatterns = [
     path("logout/", views.logout_view, name="logout"),
     #path('login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
     path("hub/", views.home, name="home"),
+    path("datenschutzerklaerung/", views.datenschutzerklaerung, name="datenschutzerklaerung"),
+    path("agb/", views.agb, name="agb"),
     path("hub/create-customer/", views.create_customer, name="create_customer"),
     path("create-customer/", views.create_customer, name="create_customer"),
     path("edit-customer/<int:id>/", views.edit_customer, name="edit_customer"),
