@@ -87,7 +87,9 @@ def prepare_company_file(company_name):
     return HttpResponse("OK")
 
 
-def create_assistant(company_name, customer_object):
+
+def create_assistant(company_name, customer_object, file_path, category_name):
+
     assistant = client_azure.beta.assistants.create(
         name="Business Assistant",
         instructions=(
@@ -102,18 +104,16 @@ def create_assistant(company_name, customer_object):
 
     print("Ausgeführt")
     print(assistant)
-    print(customer_object.training_file_path)
-
-    file_paths = [customer_object.training_file_path]
 
     file_streams = []
-    for path in file_paths:
-        with open(path, "rb") as file:
-            content = file.read()
-            if not content:
-                raise ValueError(f"The file {path} is empty or not valid.")
-            file_ext = path.split(".")[-1]
-            file_streams.append(open(path, "rb"))
+    
+    print(file_path)
+    with open(file_path, "rb") as file:
+        content = file.read()
+        if not content:
+            raise ValueError(f"The file {file_path} is empty or not valid.")
+        file_ext = file_path.split(".")[-1]
+        file_streams.append(open(file_path, "rb"))
 
     if not file_streams:
         raise ValueError("No valid files to process.")
@@ -127,60 +127,19 @@ def create_assistant(company_name, customer_object):
         tool_resources={"file_search": {"vector_store_ids": [vector_store.id]}},
     )
 
-    # message_files = [
-    #     client.files.create(file=open(path, "rb"), purpose="assistants")
-    #     for path in file_paths
-    #     if os.path.getsize(path) > 0
-    # ]
-
-    # attachments = [
-    #     {"file_id": message_file.id, "tools": [{"type": "file_search"}]}
-    #     for message_file in message_files
-    # ]
-
-    # thread = client.beta.threads.create(
-    #     messages=[
-    #         {
-    #             "role": "user",
-    #             "content": "Wer ist Inhaber von Proviral?",
-    #             "attachments": attachments,
-    #         }
-    #     ]
-    # )
-
-    # run = client.beta.threads.runs.create_and_poll(
-    #     thread_id=thread.id, assistant_id=assistant.id
-    # )
-
-    # messages = list(
-    #     client.beta.threads.messages.list(thread_id=thread.id, run_id=run.id)
-    # )
-
-    # message_content = messages[0].content[0].text
-    # annotations = message_content.annotations
-    # citations = []
-    # for index, annotation in enumerate(annotations):
-    #     message_content.value = message_content.value.replace(
-    #         annotation.text, f"[{index}]"
-    #     )
-    #     if file_citation := getattr(annotation, "file_citation", None):
-    #         cited_file = client.files.retrieve(file_citation.file_id)
-    #         citations.append(f"[{index}] {cited_file.filename}")
-
-    # print(message_content.value)
-    # print("\n".join(citations))
-
     print(f"Assistant ID: {assistant.id}")
-
+    chat_assistant= models.ChatAssistant.objects.create(created_for=customer_object)
+    chat_assistant.vector_store_id = vector_store.id
+    chat_assistant.assistant_id = assistant.id
+    chat_assistant.partner_name = customer_object.company_name
+    chat_assistant.category_name = category_name
+    chat_assistant.save()
+    
     customer_object.chatbot_url = f"/api/{company_name}/assistant-chat/"
     
     customer_object.save()
 
-    chat_assistant = models.ChatAssistant.objects.create(created_for=customer_object)
-    chat_assistant.vector_store_id = vector_store.id
-    chat_assistant.assistant_id = assistant.id
-    chat_assistant.partner_name = customer_object.company_name
-    chat_assistant.save()
+    
 
     return HttpResponse("OK")
 
@@ -191,6 +150,7 @@ def generate_code():
 @api_view(["POST"])
 def get_api_registration_token(request, partner = None):
     customer = models.Customer.objects.get(company_name = partner)
+    categorys= [category.category_name for category in models.ChatAssistant.objects.filter(created_for = customer)]
     uid = str(uuid4())
     while models.ChatbotUser.objects.filter(uid=uid).exists():
         uid = str(uuid4())
@@ -201,7 +161,7 @@ def get_api_registration_token(request, partner = None):
     api_registration_token_object = models.RegistrationToken.objects.create(api_registration_token = api_registration_token, created_for = chat.id)
     customer.api_registration_tokens.add(api_registration_token_object)
     customer.save()
-    return JsonResponse({"api_registration_token":api_registration_token, "uid":uid})
+    return JsonResponse({"api_registration_token":api_registration_token, "uid":uid, "categorys": categorys})
 
 
 @csrf_exempt

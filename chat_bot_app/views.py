@@ -44,7 +44,11 @@ def logout_view(request):
 @login_required(login_url="login")
 def home(request):
     customers = models.Customer.objects.filter(created_by=request.user)
-    return render(request, "chat_bot_app/home.html", {"customers": customers})
+    lead_amount = 0
+    for customer in customers:
+        lead_amount += len(models.Lead.objects.filter(created_for= customer.id))
+    
+    return render(request, "chat_bot_app/home.html", {"customers": customers, "lead_amount":lead_amount, "user_amount": len(customers)})
 
 
 def validate_jsonl_file(file):
@@ -69,11 +73,7 @@ def create_customer(request):
         # website_url = request.POST.get("website_url")
 
         # Erhalte die hochgeladene Datei
-        uploaded_file = request.FILES.get("file_upload")
-        if uploaded_file is None:
-            return HttpResponse("Es muss eine Datei hochgeladen werden.")
-        if not validate_jsonl_file(uploaded_file):
-            return HttpResponse("Die Datei muss mindestens 2 Zeilen Lang sein.")
+     
 
         css_url = f"/api/{company_name}/dynamic-css/"
         js_url = f"/api/{company_name}/dynamic-js/"
@@ -321,30 +321,54 @@ def create_customer(request):
             font-size: 14px;
         }}
     """,
-            # website_url=website_url,
         )
-        print(customer.code)
-        # crawl_url.crawl_website(website_url, company_name)
 
-        # Überprüfe, ob eine Datei hochgeladen wurde
-        if uploaded_file:
-            upload_dir = os.path.join("uploaded_files", company_name)
-            os.makedirs(upload_dir, exist_ok=True)
+        if 'diverse_category' in request.POST:
+            category_names = request.POST.getlist('category_names')
+            category_files = request.FILES.getlist('category_files')
+            
+            if len(category_names) != len(category_files):
+                return HttpResponse("Jede Kategorie muss eine Datei haben.")
+            
+            for category_name, category_file in zip(category_names, category_files):
+                if not category_file.name.endswith('.txt'):
+                    return HttpResponse(f"Die Datei {category_file.name} muss eine .txt-Datei sein.")
 
-            # Speichern der Datei
-            file_path = os.path.join(upload_dir, uploaded_file.name)
-            with open(file_path, "wb+") as destination:
-                for chunk in uploaded_file.chunks():
-                    destination.write(chunk)
+                # Speichern der Datei
+                upload_dir = os.path.join("uploaded_files", company_name, category_name)
+                os.makedirs(upload_dir, exist_ok=True)
 
-            # Speichere den Dateipfad in der Datenbank
-            customer.training_file_path = file_path
+                file_path = os.path.join(upload_dir, category_file.name)
+                with open(file_path, "wb+") as destination:
+                    for chunk in category_file.chunks():
+                        destination.write(chunk)
+                customer.file_paths.add(models.Path.objects.create(training_file_path=file_path))
+                openAi.create_assistant(company_name, customer, file_path, category_name )
+
+        # Einzelne Unternehmensinformationen (falls keine Kategorien ausgewählt sind)
+        else:
+            uploaded_file = request.FILES.get("file_upload")
+            if uploaded_file:
+                if not uploaded_file.name.endswith('.txt'):
+                    return HttpResponse("Die Datei muss eine .txt-Datei sein.")
+
+                upload_dir = os.path.join("uploaded_files", company_name)
+                os.makedirs(upload_dir, exist_ok=True)
+
+                # Speichern der Datei
+                file_path = os.path.join(upload_dir, uploaded_file.name)
+                with open(file_path, "wb+") as destination:
+                    for chunk in uploaded_file.chunks():
+                        destination.write(chunk)
+                customer.file_paths.add(models.Path.objects.create(training_file_path=file_path))
+                openAi.create_assistant(company_name, customer, file_path, "general_info" )
+        
         customer.save()
 
         # openAi.prepare_company_file(company_name)
         # openAi.create_fine_tuning_model(company_name, customer)
         # openAi.prepare_company_file(company_name)
-        openAi.create_assistant(company_name, customer)
+        
 
         return redirect(f"/edit-customer/{customer.id}/")
 

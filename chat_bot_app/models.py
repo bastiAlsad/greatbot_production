@@ -28,6 +28,9 @@ class RegistrationToken(models.Model):
     created_at = models.DateTimeField(default=timezone.now())
     created_for = models.IntegerField(default=0)
 
+class Path(models.Model):
+    training_file_path = models.CharField(default="", max_length=300)
+
 class Customer(models.Model):
     company_name = models.CharField(default="", max_length=300)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -42,7 +45,7 @@ class Customer(models.Model):
     css_url = models.CharField(default="", max_length=300)
     save_user_data_url = models.CharField(default="", max_length=300)
     send_message_url = models.CharField(default="", max_length=300)
-    training_file_path = models.CharField(default="", max_length=300)
+    file_paths = models.ManyToManyField(Path)
     code = models.TextField(default="")
     css_code = models.TextField(default="")
     api_registration_tokens = models.ManyToManyField(RegistrationToken)
@@ -53,6 +56,7 @@ class SummariserAssistant(models.Model):
 class ChatAssistant(models.Model):
     created_for = models.ForeignKey(Customer, on_delete=models.CASCADE)
     partner_name = models.CharField(default = "", max_length=300)
+    category_name = models.CharField(default = "", max_length=300)
     assistant_id = models.CharField(default = "", max_length=300)
     vector_store_id = models.CharField(default = "", max_length=300)
 

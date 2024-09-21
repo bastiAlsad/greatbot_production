@@ -5,3 +5,4 @@ from . import models
 admin.site.register(models.Request)
 admin.site.register(models.Lead)
 admin.site.register(models.Customer)
+admin.site.register(models.Themengebiet)

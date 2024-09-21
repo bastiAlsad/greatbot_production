@@ -17,16 +17,6 @@ Neuen Kunden anlegen
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Customer</title>
     <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            font-family: 'Arial', sans-serif;
-            background-color: #f5f5f5;
-        }
-
         .container {
             display: flex;
             width: 80%;
@@ -35,6 +25,7 @@ Neuen Kunden anlegen
             overflow: hidden;
             background-color: white;
             padding: 20px;
+            margin-top: 90px;
         }
 
         .form-container {
@@ -119,9 +110,28 @@ Neuen Kunden anlegen
                         <img id="logo-preview" src="" alt="Logo Vorschau">
                     </div>
                 </div>
+                <label for="diverse_category">Verschiedene Chat-Kategorien (z.B. Produkte, Reklamation, ...)</label>
+                <div
+                    style="display: flex;flex-direction: row; justify-content: space-between; align-items: start; margin-bottom: 15px;">
+                    <div style="height: 20px; width: 20px;margin-bottom: 15px;">
+                        <input style="height: 100%; width: 100%; align-self: center;" type="checkbox"
+                            id="diverse_category" name="diverse_category">
+                    </div>
+                    <button style="width: 180px;" id="add_category">Kategorie hinzufügen</button>
+                </div>
 
-                <label for="file_upload">Informationen über das Unternehmen</label>
-                <input type="file" id="file_upload" name="file_upload" required accept=".txt">
+
+                <div id="company_info">
+                    <label for="file_upload">Unternehmensinformationen</label>
+                    <input type="file" id="file_upload" name="file_upload" required accept=".txt">
+                </div>
+
+
+
+                <!-- Bereich für die Kategorie-Liste (initial versteckt) -->
+                <div id="category_list" style="display: none;">
+                    <ul id="categories"></ul>
+                </div>
 
                 <!-- <label for="website-url">Website URL des Unternehmens </label>
                 <input type="url" id="website_url" name="website_url" placeholder="https://" required> -->
@@ -147,32 +157,118 @@ Neuen Kunden anlegen
     </div>
 
     <script>
+        // Die initiale Logik für das Preview des Logos
         function previewLogo() {
             const logoUrl = document.getElementById('logo_url').value;
             const logoPreview = document.getElementById('logo-preview');
 
             if (logoUrl) {
                 logoPreview.src = logoUrl;
-
                 logoPreview.style.display = 'block';
             } else {
                 logoPreview.style.display = 'none';
             }
         }
+
+        // Checkbox Event Listener, um die UI entsprechend anzupassen
+        document.getElementById('diverse_category').addEventListener('change', function () {
+            const isChecked = this.checked;
+            const companyInfo = document.getElementById('company_info');
+            const categoryList = document.getElementById('category_list');
+            const companyNameInput = document.getElementById('company_name');
+            const addCategoryBtn = document.getElementById('add_category');
+            const file_upload = document.getElementById('file_upload');
+
+            if (isChecked) {
+                // Verstecke Unternehmensinformationen und Dateiupload
+                companyInfo.style.display = 'none';
+                companyNameInput.required = false; // Unternehmensname ist nicht mehr erforderlich
+                categoryList.style.display = 'block';
+                addCategoryBtn.style.display = 'block';
+                file_upload.required = false;
+
+            } else {
+                // Zeige Unternehmensinformationen und Dateiupload
+                companyInfo.style.display = 'block';
+                companyNameInput.required = true; // Unternehmensname wird wieder erforderlich
+                categoryList.style.display = 'none';
+                addCategoryBtn.style.display = 'none';
+            }
+        });
+
+        // Logik für den Dateiupload
         document.getElementById('file_upload').addEventListener('change', function () {
             var fileInput = this;
 
-            // Check if more than one file is selected
+            // Überprüfe, ob mehr als eine Datei ausgewählt wurde
             if (fileInput.files.length > 1) {
                 alert("Du darfst nur eine Datei hochladen.");
-                fileInput.value = ""; // Reset the file input
+                fileInput.value = ""; // Setzt das File-Input zurück
             }
 
-            // Optionale Validierung für Dateityp
+            // Optionale Validierung für Dateitypen
             var allowedExtensions = /(\.txt)$/i;
             if (!allowedExtensions.exec(fileInput.value)) {
                 alert('Bitte lade nur Txt-Dateien hoch.');
-                fileInput.value = ''; // Reset the file input
+                fileInput.value = ''; // Setzt das File-Input zurück
+            }
+        });
+
+        // Logik für das Hinzufügen von Kategorien
+        document.getElementById('add_category').addEventListener('click', function (event) {
+            event.preventDefault(); // Verhindert das automatische Absenden des Formulars
+            const categoryList = document.getElementById('category_list');
+
+            // Erstelle ein neues Div-Element für die Kategorie
+            const newCategory = document.createElement('div');
+            newCategory.classList.add('category-item');
+
+            // Erstelle ein Input-Feld für den Kategorienamen
+            const categoryNameInput = document.createElement('input');
+            categoryNameInput.type = 'text';
+            categoryNameInput.name = 'category_names'; // Ein Array für die Kategorienamen
+            categoryNameInput.placeholder = 'Name der Kategorie';
+            categoryNameInput.required = true;
+
+            // Erstelle ein Input-Feld für den Datei-Upload
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.name = 'category_files'; // Ein Array für die Dateien
+            fileInput.accept = '.txt';
+            fileInput.required = true;
+
+            // Füge die Input-Felder dem neuen Kategorie-Div hinzu
+            newCategory.appendChild(categoryNameInput);
+            newCategory.appendChild(fileInput);
+
+            // Füge das neue Kategorie-Div zur Liste hinzu
+            categoryList.appendChild(newCategory);
+        });
+
+
+        // Validierung des Formulars vor dem Absenden
+        document.querySelector('form').addEventListener('submit', function (event) {
+            const isCategoryChecked = document.getElementById('diverse_category').checked;
+            const categoryList = document.getElementById('categories').children;
+
+            if (isCategoryChecked) {
+                // Prüfe, ob mindestens eine Kategorie mit Name und Datei vorhanden ist
+                let valid = true;
+                for (let i = 0; i < categoryList.length; i++) {
+                    const categoryName = categoryList[i].querySelector('input[type="text"]').value;
+                    const categoryFile = categoryList[i].querySelector('input[type="file"]').files.length;
+
+                    if (!categoryName || categoryFile === 0) {
+                        valid = false;
+                        break;
+                    }
+                }
+
+                if (!valid) {
+                    alert("Bitte stellen Sie sicher, dass jede Kategorie einen Namen und eine Datei hat.");
+                    console.log("sajkfhkjahfkj");
+                    event.preventDefault(); // Verhindert das Absenden des Formulars
+                }
             }
         });
     </script>
