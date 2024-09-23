@@ -287,7 +287,11 @@ def chatApplication(request, partner=None):
             return JsonResponse({"error": "Permission Error"}, status=403)
         chat = models.ChatbotUser.objects.get(uid=uid, created_for=customer.id)
         try:
-            assistant_instance = models.ChatAssistant.objects.get(partner_name=partner)
+            selectedCategory = request.POST.get("selectedCategory")
+            if selectedCategory != "general_info":
+                assistant_instance =  models.ChatAssistant.objects.get(partner_name=partner, category_name = selectedCategory)
+            else:
+                assistant_instance = models.ChatAssistant.objects.get(partner_name=partner)
             # finetune_instance = models.ChatFineTuneModel.objects.get(partner_name = partner)
             models.Request.objects.create(created_for=customer.id)
             question = request.POST.get("message")
@@ -377,7 +381,7 @@ def chatApplication(request, partner=None):
 
 def generate_interest_email(question_string, name, language):
     response = client_azure.chat.completions.create(
-        model="gpt-4o",
+        model="gpt-4o-mini",
         messages=[
             {
                 "role": "system",

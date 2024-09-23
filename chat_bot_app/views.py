@@ -46,9 +46,17 @@ def home(request):
     customers = models.Customer.objects.filter(created_by=request.user)
     lead_amount = 0
     for customer in customers:
-        lead_amount += len(models.Lead.objects.filter(created_for= customer.id))
-    
-    return render(request, "chat_bot_app/home.html", {"customers": customers, "lead_amount":lead_amount, "user_amount": len(customers)})
+        lead_amount += len(models.Lead.objects.filter(created_for=customer.id))
+
+    return render(
+        request,
+        "chat_bot_app/home.html",
+        {
+            "customers": customers,
+            "lead_amount": lead_amount,
+            "user_amount": len(customers),
+        },
+    )
 
 
 def validate_jsonl_file(file):
@@ -73,7 +81,6 @@ def create_customer(request):
         # website_url = request.POST.get("website_url")
 
         # Erhalte die hochgeladene Datei
-     
 
         css_url = f"/api/{company_name}/dynamic-css/"
         js_url = f"/api/{company_name}/dynamic-js/"
@@ -107,10 +114,11 @@ def create_customer(request):
             <div class="chat-messages" id="chatMessages">
                 <div class="message received">
                     <div class="text">
-                        <h4>Hey, Herzlich willkommen!</h4>
-                        Ich bin Greatbot und beantworte Ihnen gerne alle Fragen zu unseren Leistungen und unserem
-                        Unternehmen laxout - wie kann ich Ihnen helfen?
-                        <p>*Hinweis: Bei Verwendung des Chatbots akzeptieren Sie <a href="https://greatbot.eu.pythonanywhere.com/datenschutzerklaerung/">Datenschutzbestimmungen</a> und <a href="https://greatbot.eu.pythonanywhere.com/agb/">AGB.</a></p>
+                        <h4>Hey, Herzlich willkommen!</h4> Wobei kann ich Ihnen helfen?
+                        <div id="categorySelection" style="display: none;">
+                            <div id="categories" style="display: flex; flex-direction: column;"></div>
+                        </div>
+                        <p style="font-size: 7;">*Hinweis: Bei Verwendung des Chatbots akzeptieren Sie <a href="https://greatbot.eu.pythonanywhere.com/datenschutzerklaerung/">Datenschutzbestimmungen</a> und <a href="https://greatbot.eu.pythonanywhere.com/agb/">AGB.</a></p>
                     </div>
                 </div>
             </div>
@@ -125,214 +133,261 @@ def create_customer(request):
 """,
             css_code=f"""
     :root {{
-/* Senden Button*/
-            --button-text-color: white;
-            --button-color: #4ec0c2;
-            --button-border-color: #4ec0c2;
+    --primary-color-dark: #060606;
+    --primary-color-bright: whitesmoke;
+    --secondary-color: #14ca74;
+    --header-color: #15221a;
+}}
 
-/* Cheat header wo assistant chat und x button drin sind*/
-            --header-color: #4ec0c2;
-            --header-text-color:white;
+/* Link Styling */
+a {{
+    color: var(--primary-color-dark);
+}}
 
-/* X Button links oben*/
-            --back-button-color: white;
-            --back-button-text-color: black;
+/* Default: Base Styles for Desktop (Webflow default 992px+) */
 
-/* Input Feld der User Nachricht*/
-            --input-field-color: #F2F0F7;
-            --input-field-text-color: black;
-            --input-field-border-color: #F2F0F7;
-            
-/* Section ganz unten wo das input field und der button drin sind*/
-            --footer-color: white;  
-          
-/* Bot Nachricht*/
-            --bot-message-color: white;
-            --bot-message-text-color: black;
-            --bot-message-border-color: #DDD;
+#chatbot {{
+    position: fixed;
+    bottom: 3rem;
+    right: 3rem;
+    z-index: 9999;
+}}
 
-/*  User Nachricht*/
-            --user-message-color: #4ec0c2;
-            --user-message-text-color: white;
-            --user-message-border-color: #4ec0c2;
+#chatbot-container {{
+    font-family: Urbanist, sans-serif;
+    background-color: var(--primary-color-dark);
+    margin: 0rem;
+    padding: 0rem;
+}}
 
-/*  Button der den Chat aus und einklappt*/
-            --chat-button-color: #4ec0c2;
-            --chat-button-text-color: white;
-            --chat-button-border-color: #4ec0c2;
+#chatbot-button {{
+    background-color: var(--primary-color-dark);
+    border: solid 0.1rem var(--secondary-color);
+    color: var(--primary-color-bright);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem;
+    width: 4.5rem;
+    height: 4.5rem;
+    border-radius: 100vw;
+    cursor: pointer;
+}}
 
-/*  Chat Hintergrund*/
-            --chat-background-color: #F2F0F7 ;
-            
-        }}
-        #chatbot-container {{
-            font-family: Arial, sans-serif;
-            background-color: var(--chat-background-color);
-            border-color: var(--chat-border-color);
-            margin: 0;
-            padding: 0;
-        }}
+#chatbot-window {{
+    display: none;
+    width: 25rem;
+    height: 72.5vh;
+    background-color: transparent;
+    border-radius: 1.25rem;
+    border: solid 0.1rem var(--secondary-color);
+    position: absolute;
+    bottom: 6.75rem;
+    right: 3rem;
+    overflow: hidden;
+    flex-direction: column;
+    justify-content: space-between;
+    transform: scale(0);
+    transform-origin: bottom right;
+    transition: transform 0.33s ease-out;
+}}
 
-        #chatbot {{
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 9999;
-        }}
+#chatbot-window.open {{
+    transform: scale(1);
+}}
 
-        #chatbot-button {{
-            background-color: var(--chat-button-color);
-            border: solid 2px var(--chat-button-border-color);
-            color: var(--chat-button-text-color);
-            padding: 15px;
-            border-radius: 50%;
-            cursor: pointer;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-        }}
+#chatbot-container .chat-header {{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--header-color);
+    color: var(--primary-color-bright);
+    padding: 0.5rem 1rem;
+    text-align: center;
+    position: relative;
+    min-height: 10%;
+}}
 
-        #form-container {{
-            display: flex;
-            flex-direction: column;
-        }}
+#chatbot-container .chat-header .back-button {{
+    display: flex;
+    align-items: center;
+    justify-items: center;
+    position: absolute;
+    left: 1rem;
+    background-color: var(--primary-color-bright);
+    color: var(--primary-color-dark);
+    border: none;
+    border-radius: 100vw;
+    height: 1.75rem;
+    width: 1.75rem;
+    cursor: pointer;
+}}
 
-        #chatbot-window {{
-            display: none;
-            width: 400px;
-            height: 500px;
-            background-color: white;
-            border-radius: 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-            position: absolute;
-            bottom: 60px;
-            right: 0;
-            overflow: hidden;
-            flex-direction: column;
-            justify-content: space-between;
-            transform: scale(0);
-            transform-origin: bottom right;
-            transition: transform 0.3s ease;
-        }}
+#chatbot-container .chat-messages {{
+    display: flex;
+    flex-direction: column;
+    row-gap: 1rem;
+    padding: 1rem;
+    height: 100%;
+    width: 100%;
+    overflow-y: auto;
+    background-color: var(--primary-color-dark);
+}}
 
-        #chatbot-window.open {{
-            transform: scale(1);
-        }}
+#chatbot-container .chat-input {{
+    display: flex;
+    padding: 1rem;
+    background-color: var(--primary-color-bright);
+}}
 
-        @media screen and (max-width: 600px) {{
-            #chatbot {{
-                bottom: 20px;
-                right: 20px;
-            }}
+#chatbot-container .chat-input input {{
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: solid 0.1rem var(--secondary-color);
+    color: var(--primary-color-dark);
+    border-radius: 1.25rem;
+    background-color: var(--primary-color-bright);
+    margin-right: 1rem;
+    outline: none;
+}}
 
-            #chatbot-window {{
-                width: 100vw;
-                height: 100vh;
-                bottom: 0;
-                right: 0;
-                border-radius: 0;
-                transform-origin: bottom right;
-            }}
+#chatbot-container .chat-input button {{
+    background-color: var(--primary-color-dark);
+    border: solid 0.1rem var(--secondary-color);
+    color: var(--primary-color-bright);
+    padding: 0.75rem 1rem;
+    border-radius: 1rem;
+    cursor: pointer;
+    outline: none;
+}}
 
-            #chatbot.open {{
-                bottom: 0;
-                right: 0;
-            }}
-        }}
+#chatbot-container .message.sent .text {{
+    background-color: var(--primary-color-dark);
+    color: var(--primary-color-bright);
+    border: solid 0.1rem var(--secondary-color);
+    border-radius: 1rem 1rem 0rem 1rem;
+    margin-left: auto;
+}}
 
-        #chatbot-container .chat-header {{
-            background-color: var(--header-color);
-            color: var(--header-text-color);
-            padding: 15px;
-            text-align: center;
-            position: relative;
-        }}
+#chatbot-container .message.received .text {{
+    background-color: var(--primary-color-bright);
+    color: var(--primary-color-dark);
+    border: 0.1em solid var(--secondary-color);
+    border-radius: 1rem 1rem 1rem 0rem;
+}}
 
-        #chatbot-container .chat-header .back-button {{
-            position: absolute;
-            left: 10px;
-            top: 10px;
-            background-color: var(--back-button-color);
-            color: var(--back-button-text-color);
-            border: none;
-            border-radius: 50%;
-            height: 30px;
-            width: 30px;
-            cursor: pointer;
-        }}
+#chatbot-container .message .text {{
+    max-width: 75%;
+    padding: 1rem 1rem;
+    line-height: 1.25;
+    font-size: 0.75rem;
+}}
 
-        #chatbot-container .chat-messages {{
-            padding: 20px;
-            height: calc(100% - 100px);
-            overflow-y: auto;
-            background-color: var(--chat-background-color);
-        }}
+/* Webflow Tablet (991px and below) */
+@media (max-width: 991px) {{
 
-        #chatbot-container .chat-input {{
-            display: flex;
-            padding: 10px;
-            background-color: var(--footer-color);
-        }}
+    #chatbot {{
+        position: fixed;
+        bottom: 1.5rem;
+        right: 2rem;
+        z-index: 9999;
+    }}
 
-        #chatbot-container .chat-input input {{
-            flex: 1;
-            padding: 10px;
-            border: solid 2px var(--input-field-border-color);
-            color: var(--input-field-text-color);
-            border-radius: 20px;
-            background-color: var(--input-field-color);
-            margin-right: 10px;
-            outline: none;
-        }}
+    #chatbot-window {{
+        width: 40vw;
+        height: 33rem;  
+        bottom: 5.75rem;
+        right: 2rem;
+    }}
 
-        #chatbot-container .chat-input button {{
-            background-color: var(--button-color);
-            border: solid 2px var(--button-border-color);
-            color: var(--button-text-color);
-            padding: 10px 20px;
-            border-radius: 20px;
-            cursor: pointer;
-            outline: none;
-        }}
+    #chatbot-button {{
+        width: 3.5rem;
+        height: 3.5rem;
+    }}
 
-        #chatbot-container .message {{
-            margin-bottom: 10px;
-            display: flex;
-            align-items: flex-end;
-        }}
+    #chatbot-container .chat-header {{
+        padding: 0.5rem 1rem;
+    }}
 
-        #chatbot-container .message.sent .text {{
-            background-color: var(--user-message-color);
-            color: var(--user-message-text-color);
-            border: solid 2px var(--user-message-border-color);
-            margin-left: auto;
-            border-radius: 15px 15px 0 15px;
-        }}
+    #chatbot-container .chat-header .back-button {{
+        left: 1rem;
+        height: 1.75rem;
+        width: 1.75rem;
+    }}
 
-        #chatbot-container .message.received .text {{
-            background-color: var(--bot-message-color);
-            color: var(--bot-message-text-color);
-            border: 1px solid var(--bot-message-border-color);
-            border-radius: 15px 15px 15px 0;
-        }}
+    #chatbot-container .chat-input {{
+        padding: 1em;
+    }}
 
-        #chatbot-container .message .text {{
-            max-width: 60%;
-            padding: 10px 15px;
-            line-height: 1.4;
-            font-size: 14px;
-        }}
+    #chatbot-container .chat-messages {{
+        padding: 0.75rem;
+    }}
+}}
+
+/* Webflow Mobile Landscape (767px and below) */
+@media (max-width: 767px) {{
+    #chatbot-button {{
+        display: none;
+    }}
+}}
+
+/* Webflow Mobile Portrait (479px and below) */
+@media (max-width: 479px) {{
+
+    #chatbot {{
+        position: fixed;
+        bottom: 2.5vw;
+        right: 3.5vw;
+        z-index: 9999;
+    }}
+
+    #chatbot-window {{
+        width: 95svw;
+        height: 97.5svh;
+        bottom: 0rem;
+        right: 0rem;
+    }}
+
+    #chatbot-button {{
+        display: flex;
+        width: 3.25rem;
+        height: 3.25rem;
+        padding: 0.5rem;
+    }}
+
+    #chatbot-container .chat-header {{
+        padding: 0.5rem 0.75rem;
+    }}
+
+    #chatbot-container .chat-header .back-button {{
+        left: 0.5rem;
+        padding: 0.25rem;
+        height: 1.5rem;
+        width: 1.5rem;
+    }}
+
+    #chatbot-container .chat-input {{
+        padding: 0.5rem;
+    }}
+
+    #chatbot-container .chat-messages {{
+        padding: 0.5rem;
+    }}
     """,
         )
 
-        if 'diverse_category' in request.POST:
-            category_names = request.POST.getlist('category_names')
-            category_files = request.FILES.getlist('category_files')
-            
+        if "diverse_category" in request.POST:
+            category_names = request.POST.getlist("category_names")
+            category_files = request.FILES.getlist("category_files")
+
             if len(category_names) != len(category_files):
                 return HttpResponse("Jede Kategorie muss eine Datei haben.")
-            
+
             for category_name, category_file in zip(category_names, category_files):
-                if not category_file.name.endswith('.txt'):
-                    return HttpResponse(f"Die Datei {category_file.name} muss eine .txt-Datei sein.")
+                if not category_file.name.endswith(".txt"):
+                    return HttpResponse(
+                        f"Die Datei {category_file.name} muss eine .txt-Datei sein."
+                    )
 
                 # Speichern der Datei
                 upload_dir = os.path.join("uploaded_files", company_name, category_name)
@@ -342,14 +397,18 @@ def create_customer(request):
                 with open(file_path, "wb+") as destination:
                     for chunk in category_file.chunks():
                         destination.write(chunk)
-                customer.file_paths.add(models.Path.objects.create(training_file_path=file_path))
-                openAi.create_assistant(company_name, customer, file_path, category_name )
+                customer.file_paths.add(
+                    models.Path.objects.create(training_file_path=file_path)
+                )
+                openAi.create_assistant(
+                    company_name, customer, file_path, category_name
+                )
 
         # Einzelne Unternehmensinformationen (falls keine Kategorien ausgewählt sind)
         else:
             uploaded_file = request.FILES.get("file_upload")
             if uploaded_file:
-                if not uploaded_file.name.endswith('.txt'):
+                if not uploaded_file.name.endswith(".txt"):
                     return HttpResponse("Die Datei muss eine .txt-Datei sein.")
 
                 upload_dir = os.path.join("uploaded_files", company_name)
@@ -360,15 +419,18 @@ def create_customer(request):
                 with open(file_path, "wb+") as destination:
                     for chunk in uploaded_file.chunks():
                         destination.write(chunk)
-                customer.file_paths.add(models.Path.objects.create(training_file_path=file_path))
-                openAi.create_assistant(company_name, customer, file_path, "general_info" )
-        
+                customer.file_paths.add(
+                    models.Path.objects.create(training_file_path=file_path)
+                )
+                openAi.create_assistant(
+                    company_name, customer, file_path, "general_info"
+                )
+
         customer.save()
 
         # openAi.prepare_company_file(company_name)
         # openAi.create_fine_tuning_model(company_name, customer)
         # openAi.prepare_company_file(company_name)
-        
 
         return redirect(f"/edit-customer/{customer.id}/")
 

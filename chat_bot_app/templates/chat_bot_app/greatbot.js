@@ -33,35 +33,6 @@ function selectCategory(category) {
   document.getElementById("categorySelection").style.display = "none";
 }
 
-window.onload = function () {
-  fetch("https://greatbot.eu.pythonanywhere.com/api/" + company_name + "/assistant-chat/getapiregistrationtoken", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",  // JSON als Content-Type
-      // "X-CSRFToken": token, // Falls du CSRF-Token benötigst
-    },
-    body: JSON.stringify({})  // Leerer Body, wenn nichts übergeben wird
-  })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error("API Request failed");
-      }
-      return response.json();  // Die Antwort in JSON umwandeln
-    })
-    .then(data => {
-      uid = data.uid;
-      api_registration_token = data.api_registration_token;
-      categories = data.categorys;
-      if (categories.length > 1) {
-        showCategorySelection(categories);
-      }else{
-        selectCategory = "general_info";
-      }
-    })
-    .catch(error => {
-      console.error("Error fetching the API data:", error);
-    });
-};
 
 function sendPersonalData() {
   var name = document.getElementById("chatbot_user_name").value;
@@ -100,6 +71,33 @@ function sendPersonalData() {
 function toggleChat() {
   const chatWindow = document.getElementById("chatbot-window");
   const chatbutton = document.getElementById("chatbot");
+  fetch("https://greatbot.eu.pythonanywhere.com/api/" + company_name + "/assistant-chat/getapiregistrationtoken", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",  // JSON als Content-Type
+      // "X-CSRFToken": token, // Falls du CSRF-Token benötigst
+    },
+    body: JSON.stringify({})  // Leerer Body, wenn nichts übergeben wird
+  })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error("API Request failed");
+      }
+      return response.json();  // Die Antwort in JSON umwandeln
+    })
+    .then(data => {
+      uid = data.uid;
+      api_registration_token = data.api_registration_token;
+      categories = data.categorys;
+      if (categories.length > 1) {
+        showCategorySelection(categories);
+      }else{
+        selectCategory = "general_info";
+      }
+    })
+    .catch(error => {
+      console.error("Error fetching the API data:", error);
+    });
   if (chatWindow.classList.contains("open")) {
     chatWindow.classList.remove("open");
     chatbutton.classList.remove("open");
@@ -115,7 +113,7 @@ function sendMessage() {
   var messageInput = document.getElementById("messageInput");
   var message = messageInput.value;
   if (message.trim() !== "") {
-    if (selectCategory === ""){
+    if (selectedCategory === ""){
       alert("Bitte wählen Sie eine Kategorie aus, zu der Sie Ihre Frage stellen möchten.");
     }
     const chatMessages = document.getElementById("chatMessages");
@@ -136,6 +134,7 @@ function sendMessage() {
     formedData.append("chatbotResponses", chatbotResponses);
     formedData.append("uid", uid);
     formedData.append("api_registration_token", api_registration_token);
+    formedData.append("selectedCategory", selectedCategory);
 
     fetch("https://greatbot.eu.pythonanywhere.com/api/" + company_name + "/assistant-chat/sendmessage/", {
       method: "POST",
