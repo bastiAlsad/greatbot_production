@@ -91,8 +91,9 @@ function toggleChat() {
       categories = data.categorys;
       if (categories.length > 1) {
         showCategorySelection(categories);
+        console.log("select a category choice");
       }else{
-        selectCategory = "general_info";
+        selectedCategory = "general_info";
       }
     })
     .catch(error => {

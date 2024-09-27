@@ -15,7 +15,7 @@ Neuen Kunden anlegen
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Customer</title>
+    <title>Create Chatbot</title>
     <style>
         .container {
             display: flex;
@@ -94,7 +94,7 @@ Neuen Kunden anlegen
 <body>
     <div class="container">
         <div class="form-container">
-            <h2>Neuer Kunde</h2>
+            <h2>Neuer File-Bot</h2>
             <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                 <label for="company-name">Name des Unternehmens</label>
@@ -123,7 +123,7 @@ Neuen Kunden anlegen
 
                 <div id="company_info">
                     <label for="file_upload">Unternehmensinformationen</label>
-                    <input type="file" id="file_upload" name="file_upload" required accept=".txt">
+                    <input type="file" id="file_upload" name="file_upload" required accept=".txt, .pdf">
                 </div>
 
 
@@ -207,7 +207,7 @@ Neuen Kunden anlegen
             }
 
             // Optionale Validierung für Dateitypen
-            var allowedExtensions = /(\.txt)$/i;
+            var allowedExtensions = /(\.txt|\.pdf)$/i;
             if (!allowedExtensions.exec(fileInput.value)) {
                 alert('Bitte lade nur Txt-Dateien hoch.');
                 fileInput.value = ''; // Setzt das File-Input zurück

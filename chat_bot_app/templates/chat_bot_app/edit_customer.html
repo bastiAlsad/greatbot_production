@@ -14,6 +14,13 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/xml/xml.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/edit/matchbrackets.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/edit/closebrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/addon/hint/show-hint.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/addon/hint/css-hint.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/addon/hint/html-hint.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/javascript/javascript.min.js"></script>
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/addon/hint/show-hint.min.css">
 
 <!DOCTYPE html>
 <html lang="de">
@@ -108,6 +115,9 @@
             width: 100%;
             margin-bottom: 20px;
         }
+        .button-fullscreen{
+            cursor: pointer;
+        }
     </style>
 </head>
 
@@ -119,7 +129,7 @@
             <div style="display: flex; flex-direction: row; justify-content: space-between;">
                 <input type="url" id="chatbot_url" name="chatbot_url" readonly value="{{customer.chatbot_url}}">
                 <div style="margin-left: 20px; margin-top: 5px; position: relative;">
-                    <svg id="copy-btn" xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+                    <svg class = "button-fullscreen"id="copy-btn" xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
                         class="bi bi-copy" viewBox="0 0 16 16" style="cursor: pointer;">
                         <path fill-rule="evenodd"
                             d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1z" />
@@ -130,6 +140,30 @@
                     </div>
                 </div>
             </div>
+            <label for="company-name">Html-Code zum Einbetten:</label>
+            <div style="display: flex; flex-direction: row; justify-content: space-between;">
+                <textarea style="width: 100%;" id="html_code" name="html_code">{{customer.code}} </textarea>
+                <div style="margin-left: 20px; margin-top: 5px; position: relative;">
+                    <svg id="copy-btn2" xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+                        class="bi bi-copy" viewBox="0 0 16 16" style="cursor: pointer;">
+                        <path fill-rule="evenodd"
+                            d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1z" />
+                    </svg>
+                    <svg id="fullscreen-btn-html" style="cursor: pointer; position: absolute; right: 10px; bottom: 10px;" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                        fill="currentColor" class="bi bi-arrows-fullscreen" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd"
+                            d="M5.828 10.172a.5.5 0 0 0-.707 0l-4.096 4.096V11.5a.5.5 0 0 0-1 0v3.975a.5.5 0 0 0 .5.5H4.5a.5.5 0 0 0 0-1H1.732l4.096-4.096a.5.5 0 0 0 0-.707m4.344 0a.5.5 0 0 1 .707 0l4.096 4.096V11.5a.5.5 0 1 1 1 0v3.975a.5.5 0 0 1-.5.5H11.5a.5.5 0 0 1 0-1h2.768l-4.096-4.096a.5.5 0 0 1 0-.707m0-4.344a.5.5 0 0 0 .707 0l4.096-4.096V4.5a.5.5 0 1 0 1 0V.525a.5.5 0 0 0-.5-.5H11.5a.5.5 0 0 0 0 1h2.768l-4.096 4.096a.5.5 0 0 0 0 .707m-4.344 0a.5.5 0 0 1-.707 0L1.025 1.732V4.5a.5.5 0 0 1-1 0V.525a.5.5 0 0 1 .5-.5H4.5a.5.5 0 0 1 0 1H1.732l4.096 4.096a.5.5 0 0 1 0 .707" />
+                    </svg>
+                    
+                    <div id="copy-confirmation2"
+                        style="display: none; position: absolute; top: -30px; left: 50%; transform: translateX(-50%); background-color: #6c63ff; color: white; padding: 5px 10px; border-radius: 5px; font-size: 14px;">
+                        Kopiert!
+                    </div>
+                </div>
+            </div>
+            <div style="height: 20px;">
+            </div>
+
             <label for="css-name">Css-Code:</label>
             <div style="display: flex; flex-direction: row; justify-content: space-between;">
                 <div style="display: flex; flex-direction: row; justify-content: space-between; width: 100%;">
@@ -141,6 +175,11 @@
                         <path fill-rule="evenodd"
                             d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1z" />
                     </svg>
+                    <svg id="fullscreen-btn-css" style="cursor: pointer; position: absolute; right: 10px; bottom: 10px;" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                        fill="currentColor" class="bi bi-arrows-fullscreen" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd"
+                            d="M5.828 10.172a.5.5 0 0 0-.707 0l-4.096 4.096V11.5a.5.5 0 0 0-1 0v3.975a.5.5 0 0 0 .5.5H4.5a.5.5 0 0 0 0-1H1.732l4.096-4.096a.5.5 0 0 0 0-.707m4.344 0a.5.5 0 0 1 .707 0l4.096 4.096V11.5a.5.5 0 1 1 1 0v3.975a.5.5 0 0 1-.5.5H11.5a.5.5 0 0 1 0-1h2.768l-4.096-4.096a.5.5 0 0 1 0-.707m0-4.344a.5.5 0 0 0 .707 0l4.096-4.096V4.5a.5.5 0 1 0 1 0V.525a.5.5 0 0 0-.5-.5H11.5a.5.5 0 0 0 0 1h2.768l-4.096 4.096a.5.5 0 0 0 0 .707m-4.344 0a.5.5 0 0 1-.707 0L1.025 1.732V4.5a.5.5 0 0 1-1 0V.525a.5.5 0 0 1 .5-.5H4.5a.5.5 0 0 1 0 1H1.732l4.096 4.096a.5.5 0 0 1 0 .707" />
+                    </svg>
                     <div id="copy-confirmation1"
                         style="display: none; position: absolute; top: -30px; left: 50%; transform: translateX(-50%); background-color: #6c63ff; color: white; padding: 5px 10px; border-radius: 5px; font-size: 14px;">
                         Kopiert!
@@ -150,16 +189,22 @@
             <div style="height: 40px;">
 
             </div>
-            <label for="company-name">Html-Code zum Einbetten:</label>
+            
+            <label for="company-name">JS-Code für Animationen etc.:</label>
             <div style="display: flex; flex-direction: row; justify-content: space-between;">
-                <textarea style="width: 100%;" id="html_code" name="html_code">{{customer.code}} </textarea>
+                <textarea style="width: 100%;" id="js_code" name="js_code">{{customer.js_code}} </textarea>
                 <div style="margin-left: 20px; margin-top: 5px; position: relative;">
-                    <svg id="copy-btn2" xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+                    <svg id="copy-btn3" xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
                         class="bi bi-copy" viewBox="0 0 16 16" style="cursor: pointer;">
                         <path fill-rule="evenodd"
                             d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1z" />
                     </svg>
-                    <div id="copy-confirmation2"
+                    <svg id="fullscreen-btn-js" style="cursor: pointer; position: absolute; right: 10px; bottom: 10px;" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                        fill="currentColor" class="bi bi-arrows-fullscreen" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd"
+                            d="M5.828 10.172a.5.5 0 0 0-.707 0l-4.096 4.096V11.5a.5.5 0 0 0-1 0v3.975a.5.5 0 0 0 .5.5H4.5a.5.5 0 0 0 0-1H1.732l4.096-4.096a.5.5 0 0 0 0-.707m4.344 0a.5.5 0 0 1 .707 0l4.096 4.096V11.5a.5.5 0 1 1 1 0v3.975a.5.5 0 0 1-.5.5H11.5a.5.5 0 0 1 0-1h2.768l-4.096-4.096a.5.5 0 0 1 0-.707m0-4.344a.5.5 0 0 0 .707 0l4.096-4.096V4.5a.5.5 0 1 0 1 0V.525a.5.5 0 0 0-.5-.5H11.5a.5.5 0 0 0 0 1h2.768l-4.096 4.096a.5.5 0 0 0 0 .707m-4.344 0a.5.5 0 0 1-.707 0L1.025 1.732V4.5a.5.5 0 0 1-1 0V.525a.5.5 0 0 1 .5-.5H4.5a.5.5 0 0 1 0 1H1.732l4.096 4.096a.5.5 0 0 1 0 .707" />
+                    </svg>
+                    <div id="copy-confirmation3"
                         style="display: none; position: absolute; top: -30px; left: 50%; transform: translateX(-50%); background-color: #6c63ff; color: white; padding: 5px 10px; border-radius: 5px; font-size: 14px;">
                         Kopiert!
                     </div>
@@ -296,6 +341,16 @@
             }
         });
 
+        function autoCompleteOnKeyPress(editor) {
+            editor.on("inputRead", function (instance, event) {
+                // Only trigger autocomplete for actual key presses
+                if (!instance.state.completionActive) {  // If completion popup is not already active
+                    CodeMirror.commands.autocomplete(instance);
+                }
+            });
+        }
+
+        // Initialize CSS Editor with autocomplete on keypress
         var editor_css = CodeMirror.fromTextArea(document.getElementById("css_code"), {
             lineNumbers: true,
             mode: "css",
@@ -303,15 +358,39 @@
             matchBrackets: true,
             indentUnit: 2,
             autoCloseBrackets: true,
+            extraKeys: { "Ctrl-Space": "autocomplete" }, // Ctrl-Space can still trigger manually
         });
+        autoCompleteOnKeyPress(editor_css);
+        editor_css.getWrapperElement().id = "css_code_mirror";
+
+        // Initialize HTML Editor with autocomplete on keypress
         var editor_html = CodeMirror.fromTextArea(document.getElementById("html_code"), {
             lineNumbers: true,
-            mode: "text/html",  // Ensure the correct mode for HTML
+            mode: "text/html",
             theme: "default",
             matchBrackets: true,
             indentUnit: 2,
             autoCloseBrackets: true,
+            extraKeys: { "Ctrl-Space": "autocomplete" },
         });
+        autoCompleteOnKeyPress(editor_html);
+        editor_html.getWrapperElement().id = "html_code_mirror";
+
+        // Initialize JS Editor with autocomplete on keypress
+        var editor_js = CodeMirror.fromTextArea(document.getElementById("js_code"), {
+            lineNumbers: true,
+            mode: "javascript",
+            theme: "default",
+            matchBrackets: true,
+            indentUnit: 2,
+            autoCloseBrackets: true,
+            extraKeys: { "Ctrl-Space": "autocomplete" },
+        });
+        autoCompleteOnKeyPress(editor_js);
+        editor_js.getWrapperElement().id = "js_code_mirror";
+
+
+        editor_js.setSize("100%", "400px");
         editor_css.setSize("100%", "400px");
         editor_html.setSize("100%", "400px");
 
@@ -422,6 +501,19 @@
             }, 2000);
         });
 
+        document.getElementById('copy-btn3').addEventListener('click', function () {
+            const urlField = document.getElementById('js_code');
+            urlField.select();
+            urlField.setSelectionRange(0, 99999); // For mobile devices
+            navigator.clipboard.writeText(urlField.value);
+
+            const confirmation = document.getElementById('copy-confirmation3');
+            confirmation.style.display = 'block';
+            setTimeout(() => {
+                confirmation.style.display = 'none';
+            }, 2000);
+        });
+
 
         function previewLogo() {
             const logoUrl = document.getElementById('logo_url').value;
@@ -463,18 +555,61 @@
                 sendUpdate(event.target.name, event.target.value);
             });
         });
+
         editor_css.on('change', function () {
             sendUpdate('css_code', editor_css.getValue());
         });
 
-        // Überwache Änderungen im HTML CodeMirror und sende die Änderungen
-        editor_html.on('change', function () {
 
-            sendUpdate('code', editor_html.getValue()); // 'code' bezieht sich auf das HTML-Feld in der Datenbank
+        editor_html.on('change', function () {
+            sendUpdate('code', editor_html.getValue());
+        });
+
+        editor_js.on('change', function () {
+            sendUpdate('js_code', editor_js.getValue());
         });
 
         // Initialize subscription model
         document.getElementById('subscription_model').value = '{{customer.subscription_model}}';
+
+        document.getElementById("fullscreen-btn-css").addEventListener("click", function () {
+            let editorContainer = document.getElementById("css_code_mirror");
+            if (!document.fullscreenElement) {
+                editorContainer.requestFullscreen();
+                editorContainer.style.height = "100vh";
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                    editorContainer.style.height = "400px"; // Zurück zur Standardgröße
+                }
+            }
+        });
+
+        document.getElementById("fullscreen-btn-html").addEventListener("click", function () {
+            let editorContainer = document.getElementById("html_code_mirror");
+            if (!document.fullscreenElement) {
+                editorContainer.requestFullscreen();
+                editorContainer.style.height = "100vh";
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                    editorContainer.style.height = "400px"; // Zurück zur Standardgröße
+                }
+            }
+        });
+
+        document.getElementById("fullscreen-btn-js").addEventListener("click", function () {
+            let editorContainer = document.getElementById("js_code_mirror");
+            if (!document.fullscreenElement) {
+                editorContainer.requestFullscreen();
+                editorContainer.style.height = "100vh";
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                    editorContainer.style.height = "400px"; // Zurück zur Standardgröße
+                }
+            }
+        });
 
 
     </script>

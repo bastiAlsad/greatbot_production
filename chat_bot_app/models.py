@@ -49,6 +49,7 @@ class Customer(models.Model):
     code = models.TextField(default="")
     css_code = models.TextField(default="")
     api_registration_tokens = models.ManyToManyField(RegistrationToken)
+    js_code = models.TextField(default="")
 
 class SummariserAssistant(models.Model):
     assistant_id = models.CharField(default = "", max_length=300)

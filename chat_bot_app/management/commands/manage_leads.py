@@ -233,7 +233,7 @@ class Command(BaseCommand):
 
             last_day_of_month = calendar.monthrange(today.year, today.month)[1]
 
-            if today.day ==today.day: # last_day_of_month:
+            if today.day == last_day_of_month:
                 port = 587
                 password = "jezm nesb fhpj tvrv"
                 username = "laxoutapp@gmail.com"

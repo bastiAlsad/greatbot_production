@@ -161,6 +161,7 @@ def get_api_registration_token(request, partner = None):
     api_registration_token_object = models.RegistrationToken.objects.create(api_registration_token = api_registration_token, created_for = chat.id)
     customer.api_registration_tokens.add(api_registration_token_object)
     customer.save()
+    print("New Chatbot User")
     return JsonResponse({"api_registration_token":api_registration_token, "uid":uid, "categorys": categorys})
 
 
