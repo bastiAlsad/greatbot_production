@@ -106,7 +106,7 @@ def create_customer(request):
             code=f"""
 <div id="chatbot-container">
     <meta name="company-name-greatbot-ai" content="{company_name}">
-    <link rel="stylesheet" type="text/css" href="https://greatbot.eu.pythonanywhere.com{css_url}">
+    <link rel="stylesheet" type="text/css" href="https://www.greatbot.ai{css_url}">
     <div id="chatbot">
         <div id="chatbot-button" onclick="toggleChat()"><svg style="width: 50px; height: 50px;" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M121.74 67.3201C123.591 67.3201 125.401 67.8691 126.94 68.8976C128.479 69.926 129.679 71.3879 130.388 73.0982C131.096 74.8085 131.281 76.6905 130.92 78.5062C130.559 80.3218 129.668 81.9896 128.359 83.2986C127.049 84.6077 125.382 85.4991 123.566 85.8603C121.75 86.2214 119.868 86.0361 118.158 85.3276C116.448 84.6192 114.986 83.4195 113.957 81.8802C112.929 80.341 112.38 78.5313 112.38 76.6801C112.38 74.1977 113.366 71.8169 115.121 70.0616C116.877 68.3063 119.258 67.3201 121.74 67.3201Z" fill="#B59CFF"/>
@@ -127,7 +127,7 @@ def create_customer(request):
                         <div id="categorySelection" style="display: none;">
                             <div id="categories" style="display: flex; flex-direction: column;"></div>
                         </div>
-                        <p style="font-size: 7;">*Hinweis: Bei Verwendung des Chatbots akzeptieren Sie <a href="https://greatbot.eu.pythonanywhere.com/datenschutzerklaerung/">Datenschutzbestimmungen</a> und <a href="https://greatbot.eu.pythonanywhere.com/agb/">AGB.</a></p>
+                        <p style="font-size: 7;">*Hinweis: Bei Verwendung des Chatbots akzeptieren Sie <a href="https://www.greatbot.ai/datenschutzerklaerung/">Datenschutzbestimmungen</a> und <a href="https://www.greatbot.ai/agb/">AGB.</a></p>
                     </div>
                 </div>
             </div>
@@ -137,7 +137,7 @@ def create_customer(request):
             </div>
         </div>
     </div>
-    <script type="text/javascript" src="https://greatbot.eu.pythonanywhere.com{js_url}"></script>
+    <script type="text/javascript" src="https://www.greatbot.ai{js_url}"></script>
 </div> 
 """,
             css_code=f"""
@@ -433,7 +433,7 @@ function sendPersonalData() {
     formedData.append("uid", uid);
     formedData.append("api_registration_token", api_registration_token);
 
-    fetch("https://greatbot.eu.pythonanywhere.com/api/" + company_name + "/assistant-chat/saveuserdata/", {
+    fetch("https://www.greatbot.ai/api/" + company_name + "/assistant-chat/saveuserdata/", {
       method: "POST",
       body: formedData
     })
@@ -458,7 +458,7 @@ function sendPersonalData() {
 function toggleChat() {
   const chatWindow = document.getElementById("chatbot-window");
   const chatbutton = document.getElementById("chatbot");
-  fetch("https://greatbot.eu.pythonanywhere.com/api/" + company_name + "/assistant-chat/getapiregistrationtoken", {
+  fetch("https://www.greatbot.ai/api/" + company_name + "/assistant-chat/getapiregistrationtoken", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",  // JSON als Content-Type
@@ -524,7 +524,7 @@ function sendMessage() {
     formedData.append("api_registration_token", api_registration_token);
     formedData.append("selectedCategory", selectedCategory);
 
-    fetch("https://greatbot.eu.pythonanywhere.com/api/" + company_name + "/assistant-chat/sendmessage/", {
+    fetch("https://www.greatbot.ai/api/" + company_name + "/assistant-chat/sendmessage/", {
       method: "POST",
       body: formedData
     })
