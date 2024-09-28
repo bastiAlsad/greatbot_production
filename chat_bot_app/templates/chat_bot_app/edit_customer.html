@@ -259,7 +259,7 @@
             <label for="monthly_requests">Anfragen (insgesamt):</label>
             <h3>{{request_count}}</h3>
 
-            <label for="bot_users">Nutzer des Chatbots (insgesamt):</label>
+            <label for="bot_users">Aufrufe des Chatbots (insgesamt):</label>
             <h3>{{user_count}}</h3>
 
             <label for="generated_leads">Generierte Leads (insgesamt):</label>
@@ -435,7 +435,7 @@
         const requestsChart = createChart(requestsChartCtx, 'Anfragen', requestData.total);
 
         const usersChartCtx = document.getElementById('usersChart').getContext('2d');
-        const usersChart = createChart(usersChartCtx, 'Nutzer', userData.total);
+        const usersChart = createChart(usersChartCtx, 'Aufrufe des Chats', userData.total);
 
         const leadsChartCtx = document.getElementById('leadsChart').getContext('2d');
         const leadsChart = createChart(leadsChartCtx, 'Leads', leadData.total);

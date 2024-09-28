@@ -596,7 +596,7 @@ function addContactForm() {
 }
 """,
         )
-
+#create customer logik
         if "diverse_category" in request.POST:
             category_names = request.POST.getlist("category_names")
             category_files = request.FILES.getlist("category_files")
@@ -773,18 +773,25 @@ def datenschutzerklaerung(request):
 def agb(request):
     return render(request, "chat_bot_app/agb.html")
 
-
 @login_required(login_url="login")
 def delete_customer(request, id=None):
     customer = models.Customer.objects.get(id=id)
+    related_assistants = models.ChatAssistant.objects.filter(created_for = customer)
     if customer.created_by == request.user:
+        for assistant in related_assistants:
+            openAi.delete_assistant(assistant.assistant_id)
+            openAi.delete_vector_store(assistant.vector_store_id)
+        openAi.delete_uploaded_files(customer)
         customer.delete()
         return redirect("/hub/")
     return redirect("/hub/")
 
 
 def dynamic_js(request, partner=None):
-    file_path = "/home/greatbot/greatbot_production/chat_bot_app/templates/chat_bot_app/greatbot.js"  # in production ändern !
+    customer = models.Customer.objects.get(company_name=partner)
+    if customer.js_code != "":
+        return HttpResponse(customer.js_code, content_type="application/javascript")
+    file_path = "/home/greatbot/greatbot_production/chat_bot_app/templates/chat_bot_app/greatbot.js"  
     return FileResponse(open(file_path, "rb"), content_type="application/javascript")
 
 

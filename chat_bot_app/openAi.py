@@ -136,11 +136,7 @@ def create_assistant(company_name, customer_object, file_path, category_name):
     chat_assistant.save()
     
     customer_object.chatbot_url = f"/api/{company_name}/assistant-chat/"
-    
     customer_object.save()
-
-    
-
     return HttpResponse("OK")
 
 def generate_code():
@@ -400,3 +396,30 @@ def generate_interest_email(question_string, name, language):
 
 def save_custom_embedding_code():
     pass
+
+def delete_vector_store(vector_store_id):
+    try:
+        client_azure.beta.vector_stores.delete(vector_store_id=vector_store_id)
+        print(f"Vector store {vector_store_id} deleted successfully.")
+    except Exception as e:
+        print(f"Error while deleting vector store: {str(e)}")
+
+def delete_assistant(assistant_id):
+    try:
+        client_azure.beta.assistants.delete(assistant_id=assistant_id)
+        print(f"Assistant {assistant_id} deleted successfully.")
+    except Exception as e:
+        print(f"Error while deleting assistant: {str(e)}")
+
+def delete_uploaded_files(customer):
+    for path in customer.file_paths.all():
+        file_path = path.training_file_path
+        try:
+            if os.path.exists(file_path):
+                os.remove(file_path)
+                print(f"File {file_path} deleted successfully.")
+            else:
+                print(f"File {file_path} does not exist.")
+        except Exception as e:
+            print(f"Error while deleting file {file_path}: {str(e)}")
+    customer.file_paths.all().delete()
