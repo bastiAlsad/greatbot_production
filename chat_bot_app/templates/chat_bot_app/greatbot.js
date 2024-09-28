@@ -46,7 +46,7 @@ function sendPersonalData() {
     formedData.append("uid", uid);
     formedData.append("api_registration_token", api_registration_token);
 
-    fetch("https://greatbot.eu.pythonanywhere.com/api/" + company_name + "/assistant-chat/saveuserdata/", {
+    fetch("https://www.greatbot.ai/api/" + company_name + "/assistant-chat/saveuserdata/", {
       method: "POST",
       body: formedData
     })
@@ -71,7 +71,7 @@ function sendPersonalData() {
 function toggleChat() {
   const chatWindow = document.getElementById("chatbot-window");
   const chatbutton = document.getElementById("chatbot");
-  fetch("https://greatbot.eu.pythonanywhere.com/api/" + company_name + "/assistant-chat/getapiregistrationtoken", {
+  fetch("https://www.greatbot.ai/api/" + company_name + "/assistant-chat/getapiregistrationtoken", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",  // JSON als Content-Type
@@ -137,7 +137,7 @@ function sendMessage() {
     formedData.append("api_registration_token", api_registration_token);
     formedData.append("selectedCategory", selectedCategory);
 
-    fetch("https://greatbot.eu.pythonanywhere.com/api/" + company_name + "/assistant-chat/sendmessage/", {
+    fetch("https://www.greatbot.ai/api/" + company_name + "/assistant-chat/sendmessage/", {
       method: "POST",
       body: formedData
     })
