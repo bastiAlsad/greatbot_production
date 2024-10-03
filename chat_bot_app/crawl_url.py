@@ -77,7 +77,7 @@ def crawl_and_extract(base_url, delay=1, max_pages=100):
         to_visit.update(links - visited)
         
         page_count += 1
-        time.sleep(delay)  # Add delay to reduce server load
+        #time.sleep(delay)  # Add delay to reduce server load
 
     return "\n\n".join(all_texts)
 
@@ -86,10 +86,13 @@ def save_text_to_file(text, file_path):
     with open(file_path, 'w', encoding='utf-8') as file:
         file.write(text)
 
-def crawl_website(url, company_name):
+def crawl_website(url, company_name):#
     base_url = url
     output_file = f'customer_files/{company_name}.txt'
     print("Crawling and extracting text, please wait...")
     all_texts = crawl_and_extract(base_url)
     save_text_to_file(all_texts, output_file)
     print(f"Text extracted and saved to {output_file}")
+
+
+# crawl_website()

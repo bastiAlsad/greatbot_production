@@ -106,6 +106,7 @@ def create_customer(request):
             code=f"""
 <div id="chatbot-container">
     <meta name="company-name-greatbot-ai" content="{company_name}">
+    <meta charset="UTF-8">
     <link rel="stylesheet" type="text/css" href="https://www.greatbot.ai{css_url}">
     <div id="chatbot">
         <div id="chatbot-button" onclick="toggleChat()"><svg style="width: 50px; height: 50px;" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
